@@ -13,7 +13,7 @@ import {
   Tv, Wifi, Flame, HeartPulse, ChevronRight,
   Phone, Globe, CheckCircle2, Star, Send, 
   HelpCircle, MessageSquare, ClipboardCheck, ArrowRight, MapPin,
-  MessageCircle
+  MessageCircle, Menu, X
 } from 'lucide-react';
 
 interface UserAppProps {
@@ -26,6 +26,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [selectedRoomCat, setSelectedRoomCat] = useState('Non-AC Single Room');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Contact form state
   const [senderName, setSenderName] = useState('');
@@ -107,11 +108,12 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
               </svg>
             </div>
             <div className="min-w-0">
-              <h1 className="text-sm sm:text-base md:text-lg font-bold font-sans tracking-tight text-slate-900 flex items-center gap-1.5 flex-wrap">
-                <span className="truncate">Seenu Guest House</span> 
-                <span className="text-[9px] sm:text-[10px] bg-blue-50 text-blue-700 border border-blue-150 py-0.5 px-1.5 rounded-full font-mono uppercase font-semibold shrink-0">Tours & Travels</span>
+              <h1 className="text-sm sm:text-base md:text-lg font-bold font-sans tracking-tight text-slate-900">
+                Seenu Guest House
               </h1>
-              <p className="text-[10px] sm:text-xs text-slate-500 font-light font-sans truncate">Tours and Travels</p>
+              <div className="mt-1 flex items-center">
+                <span className="text-[9px] sm:text-[10px] bg-blue-50 text-blue-700 border border-blue-150 py-0.5 px-2.5 rounded-full font-mono uppercase font-semibold shrink-0">Tours & Travels</span>
+              </div>
             </div>
           </div>
 
@@ -137,8 +139,82 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
             >
               Office Login
             </button>
+            
+            {/* Hamburger Toggle for Mobile/Tablet */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-blue-600 hover:bg-slate-100 transition-colors focus:outline-none"
+              id="hamburger-menu-toggle"
+              aria-label="Toggle Navigation Menu"
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-5 h-5 sm:w-6 sm:h-6" />
+              ) : (
+                <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
+              )}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Dropdown Menu */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden border-t border-slate-200 bg-white px-4 py-4 shadow-xl space-y-4 animate-fade-in" id="mobile-navigation-dropdown">
+            <div className="flex flex-col gap-1">
+              <button 
+                onClick={() => { scrollToSection('features-section'); setIsMobileMenuOpen(false); }} 
+                className="w-full text-left py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition"
+              >
+                Amenities
+              </button>
+              <button 
+                onClick={() => { scrollToSection('rooms-section'); setIsMobileMenuOpen(false); }} 
+                className="w-full text-left py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition"
+              >
+                Rooms & Pricing
+              </button>
+              <button 
+                onClick={() => { scrollToSection('travel-section'); setIsMobileMenuOpen(false); }} 
+                className="w-full text-left py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition"
+              >
+                Airport Pickups
+              </button>
+              <button 
+                onClick={() => { scrollToSection('interactive-map-section'); setIsMobileMenuOpen(false); }} 
+                className="w-full text-left py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition"
+              >
+                Location Guide
+              </button>
+              <button 
+                onClick={() => { scrollToSection('testimonials-section'); setIsMobileMenuOpen(false); }} 
+                className="w-full text-left py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition"
+              >
+                Testimonials
+              </button>
+              <button 
+                onClick={() => { scrollToSection('faq-section'); setIsMobileMenuOpen(false); }} 
+                className="w-full text-left py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition"
+              >
+                Support FAQs
+              </button>
+            </div>
+            
+            {/* Admin toggle for simple screens */}
+            <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
+              <button
+                onClick={() => { handleBookingStart('Non-AC Single Room'); setIsMobileMenuOpen(false); }}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 rounded-xl font-semibold text-sm transition shadow-xs flex items-center justify-center gap-1.5"
+              >
+                Book Now
+              </button>
+              <button
+                onClick={() => { onOpenAdmin(); setIsMobileMenuOpen(false); }}
+                className="w-full bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-700 border border-slate-200 text-center py-2.5 rounded-xl text-xs font-semibold font-mono tracking-tight transition"
+              >
+                Office Login
+              </button>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
