@@ -10,7 +10,7 @@ import {
   BarChart3, CalendarDays, KeyRound, Truck, 
   Mail, Settings, CheckCircle2, AlertCircle, Trash2, 
   User, RefreshCw, IndianRupee, ShieldCheck, MapPin, 
-  Maximize2, Plus, Edit2, Check, X, ShieldAlert 
+  Maximize2, Plus, Edit2, Check, X, ShieldAlert, Menu, Upload
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -48,6 +48,36 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
   const [newReviewState, setNewReviewState] = useState('West Bengal');
   const [newReviewText, setNewReviewText] = useState('');
   const [reviewSuccess, setReviewSuccess] = useState(false);
+
+  // Mobile admin navigation layout state
+  const [isAdminNavigationOpen, setIsAdminNavigationOpen] = useState(false);
+
+  // Full Room Catalog CRUD state
+  const [isRoomFormOpen, setIsRoomFormOpen] = useState(false);
+  const [roomFormMode, setRoomFormMode] = useState<'create' | 'edit'>('create');
+  const [editingRoomIdForCatalog, setEditingRoomIdForCatalog] = useState<string | null>(null);
+  
+  // Room entry state fields
+  const [roomFormNumber, setRoomFormNumber] = useState('');
+  const [roomFormCategory, setRoomFormCategory] = useState<string>('Non-AC Single Room');
+  const [roomFormPricePerDay, setRoomFormPricePerDay] = useState<number>(300);
+  const [roomFormCapacity, setRoomFormCapacity] = useState<number>(1);
+  const [roomFormBeds, setRoomFormBeds] = useState('');
+  const [roomFormAmenities, setRoomFormAmenities] = useState<string>('');
+  const [roomFormDescription, setRoomFormDescription] = useState('');
+  const [roomFormImgUrl, setRoomFormImgUrl] = useState('');
+  const [roomFormStatus, setRoomFormStatus] = useState<GuestRoom['status']>('Available');
+
+  // Manual Back-Office Bookings Walk-in parameters
+  const [isManualBookingFormOpen, setIsManualBookingFormOpen] = useState(false);
+  const [manualGuestName, setManualGuestName] = useState('');
+  const [manualGuestPhone, setManualGuestPhone] = useState('');
+  const [manualGuestState, setManualGuestState] = useState('West Bengal');
+  const [manualRoomCategory, setManualRoomCategory] = useState('Non-AC Single Room');
+  const [manualCheckIn, setManualCheckIn] = useState('');
+  const [manualCheckOut, setManualCheckOut] = useState('');
+  const [manualSpecialInstructions, setManualSpecialInstructions] = useState('');
+  const [manualPatientCardNo, setManualPatientCardNo] = useState('');
 
   useEffect(() => {
     loadAllData();
@@ -127,6 +157,145 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
     setTimeout(() => setReviewSuccess(false), 3000);
     loadAllData();
   };
+  
+  // Direct file drag and drop image upload states and handlers
+  const [roomImgDragOver, setRoomImgDragOver] = useState(false);
+
+  const handleRoomImgDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setRoomImgDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processRoomImageFile(file);
+    }
+  };
+
+  const processRoomImageFile = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      alert('Only image files (PNG, JPG, JPEG, WEBP) are supported.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        setRoomFormImgUrl(event.target.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleOpenCreateRoom = () => {
+    setRoomFormMode('create');
+    setEditingRoomIdForCatalog(null);
+    setRoomFormNumber('');
+    setRoomFormCategory('Non-AC Single Room');
+    setRoomFormPricePerDay(300);
+    setRoomFormCapacity(1);
+    setRoomFormBeds('1 Single Bed');
+    setRoomFormAmenities('Common Kitchen Access, Tap Water (Free), Self-Cleaning Setup');
+    setRoomFormDescription('');
+    setRoomFormImgUrl('https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=600&q=80');
+    setRoomFormStatus('Available');
+    setIsRoomFormOpen(true);
+  };
+
+  const handleOpenEditRoom = (room: GuestRoom) => {
+    setRoomFormMode('edit');
+    setEditingRoomIdForCatalog(room.id);
+    setRoomFormNumber(room.roomNumber);
+    setRoomFormCategory(room.category);
+    setRoomFormPricePerDay(room.pricePerDay);
+    setRoomFormCapacity(room.capacity);
+    setRoomFormBeds(room.beds);
+    setRoomFormAmenities(room.amenities.join(', '));
+    setRoomFormDescription(room.description);
+    setRoomFormImgUrl(room.imgUrl);
+    setRoomFormStatus(room.status);
+    setIsRoomFormOpen(true);
+  };
+
+  const handleSaveRoomCatalogItem = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!roomFormNumber || !roomFormCategory) return;
+
+    const amenitiesArray = roomFormAmenities
+      .split(',')
+      .map(item => item.trim())
+      .filter(item => item.length > 0);
+
+    const roomData = {
+      roomNumber: roomFormNumber,
+      category: roomFormCategory as any,
+      pricePerDay: Number(roomFormPricePerDay),
+      capacity: Number(roomFormCapacity),
+      beds: roomFormBeds,
+      amenities: amenitiesArray,
+      description: roomFormDescription,
+      imgUrl: roomFormImgUrl || 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=600&q=80',
+      status: roomFormStatus
+    };
+
+    if (roomFormMode === 'create') {
+      dbService.addRoom(roomData);
+    } else if (roomFormMode === 'edit' && editingRoomIdForCatalog) {
+      dbService.updateRoom(editingRoomIdForCatalog, roomData);
+    }
+
+    setIsRoomFormOpen(false);
+    loadAllData();
+  };
+
+  const handleDeleteRoomFromCatalog = (roomId: string) => {
+    if (confirm('Are you absolutely sure you want to completely remove this room entry from the catalog?')) {
+      dbService.deleteRoom(roomId);
+      loadAllData();
+    }
+  };
+
+  const handleSaveManualBooking = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manualGuestName || !manualGuestPhone || !manualCheckIn || !manualCheckOut) {
+      alert('Please fill out all required fields.');
+      return;
+    }
+
+    const priceMap: { [key: string]: number } = {
+      'Non-AC Single Room': 300,
+      'AC Single Room': 700,
+      'Non-AC Double Room with Balcony': 800,
+      'AC Double Room': 1200,
+      'AC Deluxe Suite with Kitchenette': 1500
+    };
+    const rate = priceMap[manualRoomCategory] || 500;
+    
+    const date1 = new Date(manualCheckIn);
+    const date2 = new Date(manualCheckOut);
+    const timeDiff = Math.abs(date2.getTime() - date1.getTime());
+    const days = Math.ceil(timeDiff / (1000 * 3600 * 24)) || 1;
+
+    dbService.addBooking({
+      guestName: manualGuestName,
+      guestPhone: manualGuestPhone,
+      guestState: manualGuestState,
+      roomCategory: manualRoomCategory as any,
+      checkInDate: manualCheckIn,
+      checkOutDate: manualCheckOut,
+      totalAmount: rate * days,
+      needTravelAssistance: false,
+      status: 'Pending',
+      specialInstructions: manualSpecialInstructions || undefined,
+      patientCardNo: manualPatientCardNo || undefined
+    });
+
+    setIsManualBookingFormOpen(false);
+    setManualGuestName('');
+    setManualGuestPhone('');
+    setManualCheckIn('');
+    setManualCheckOut('');
+    setManualSpecialInstructions('');
+    setManualPatientCardNo('');
+    loadAllData();
+  };
 
   // Pre-configured list of states to filter booking sources
   const activeBookings = bookings.filter((b) => {
@@ -137,52 +306,73 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
   return (
     <div className="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
       
-      {/* Admin header */}
-      <header className="bg-slate-900 border-b border-slate-800 shrink-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex items-center gap-3">
-            <div className="bg-emerald-500 text-slate-900 p-2.5 rounded-xl shadow">
-              <Settings className="w-6 h-6 animate-spin-slow" />
+      {/* Navigation matching landing page */}
+      <header className="sticky top-0 bg-white/95 backdrop-blur-md shadow-xs border-b border-slate-200 z-40 transition-all shrink-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-2.5 rounded-xl shadow-md shrink-0 flex items-center justify-center border border-white/10" id="seenu-brand-logo">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {/* Abstract hospitality + tour logo: A stylish roof with dual interlacing paths (for tours & travels) */}
+                <path d="M3 10L12 3L21 10" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M5 12V20C5 21.1046 5.89543 22 7 22H11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M19 12V20C19 21.1046 18.1046 22 17 22H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                {/* Emerald active travel curve representing safe health journeys */}
+                <path d="M9 13C9 13 11 11.5 12 11.5C13 11.5 15 13 15 13C15 13 13.5 16 12 16C10.5 16 9 13 9 13Z" fill="#10B981" />
+                <circle cx="12" cy="11.5" r="1.5" fill="white" />
+              </svg>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold tracking-tight text-white font-sans">Guesthouse Operations & Back Office</h1>
-                <span className="bg-emerald-500/20 text-emerald-400 font-mono text-[10px] uppercase font-black px-2 py-0.5 rounded border border-emerald-500/30">
-                  Production Mode
+            <div className="min-w-0">
+              <h1 className="text-sm sm:text-base md:text-lg font-bold font-sans tracking-tight text-slate-900">
+                Seenu Guest House
+              </h1>
+              <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                <span className="text-[9px] sm:text-[10px] bg-blue-50 text-blue-700 border border-blue-100 py-0.5 px-2 rounded-full font-mono font-semibold uppercase tracking-wider shrink-0">
+                  Tours & Travels
+                </span>
+                <span className="text-[9px] sm:text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-100 py-0.5 px-2 rounded-full font-mono font-semibold uppercase tracking-wider shrink-0">
+                  Operations Portal
                 </span>
               </div>
-              <p className="text-xs text-slate-400">Seenu Guest House, Tour's and Travels Operations Desk</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={loadAllData}
-              className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 p-2.5 rounded-lg transition"
-              title="Refresh real-time data"
+              className="bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 p-2 sm:p-2.5 rounded-xl transition cursor-pointer"
+              title="Refresh Operations Data"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
             </button>
             <button
               onClick={onBackToWebsite}
-              className="bg-emerald-500 hover:bg-emerald-400 text-slate-900 px-5 py-2.5 rounded-xl font-bold text-sm shadow transition duration-200 cursor-pointer"
+              className="bg-blue-600 hover:bg-blue-705 text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border border-transparent px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-sm hover:shadow-md transition duration-200 cursor-pointer flex items-center gap-1.5"
             >
-              &larr; Exit to Public Website
+              &larr; <span className="hidden sm:inline">Exit to</span> Website
+            </button>
+            {/* Hamburger Toggle button for small screens */}
+            <button
+              onClick={() => setIsAdminNavigationOpen(!isAdminNavigationOpen)}
+              className="lg:hidden bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 p-2 rounded-xl transition cursor-pointer"
+              title="Toggle Menu"
+              id="admin-nav-toggle"
+            >
+              {isAdminNavigationOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
           </div>
         </div>
       </header>
 
       {/* Main Admin Workspace Structure */}
-      <div className="flex-1 flex flex-col lg:flex-row max-w-7xl w-full mx-auto p-4 sm:px-6 lg:px-8 gap-6">
+      <div className="flex-1 flex flex-col lg:flex-row max-w-7xl w-full mx-auto p-4 sm:px-6 lg:px-8 gap-6 relative">
         
         {/* Left Side menu rail */}
-        <nav className="w-full lg:w-64 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3 lg:flex lg:flex-col gap-2 shrink-0">
-          <p className="text-[10px] font-mono tracking-widest text-slate-500 uppercase font-black mb-3 px-3 sm:col-span-2 md:col-span-3 lg:col-span-1">
+        <nav className={`${isAdminNavigationOpen ? 'flex' : 'hidden'} lg:flex absolute lg:relative top-4 left-4 right-4 z-30 lg:top-auto lg:left-auto lg:right-auto bg-slate-900 border border-slate-800 rounded-2xl p-4 flex-col gap-2 shrink-0 shadow-2xl lg:shadow-none lg:w-64`}>
+          <p className="text-[10px] font-mono tracking-widest text-slate-500 uppercase font-black mb-3 px-3">
             Management Modules
           </p>
           <button
-            onClick={() => setActiveTab('overview')}
+            onClick={() => { setActiveTab('overview'); setIsAdminNavigationOpen(false); }}
             className={`w-full text-left font-medium text-sm px-4 py-3 rounded-xl flex items-center gap-3 transition cursor-pointer ${
               activeTab === 'overview' ? 'bg-emerald-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
@@ -191,7 +381,7 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
             Analytics Dashboard
           </button>
           <button
-            onClick={() => setActiveTab('bookings')}
+            onClick={() => { setActiveTab('bookings'); setIsAdminNavigationOpen(false); }}
             className={`w-full text-left font-medium text-sm px-4 py-3 rounded-xl flex items-center justify-between transition cursor-pointer ${
               activeTab === 'bookings' ? 'bg-emerald-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
@@ -209,7 +399,7 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
             )}
           </button>
           <button
-            onClick={() => setActiveTab('rooms')}
+            onClick={() => { setActiveTab('rooms'); setIsAdminNavigationOpen(false); }}
             className={`w-full text-left font-medium text-sm px-4 py-3 rounded-xl flex items-center gap-3 transition cursor-pointer ${
               activeTab === 'rooms' ? 'bg-emerald-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
@@ -218,7 +408,7 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
             Rooms Status Matrix
           </button>
           <button
-            onClick={() => setActiveTab('travel')}
+            onClick={() => { setActiveTab('travel'); setIsAdminNavigationOpen(false); }}
             className={`w-full text-left font-medium text-sm px-4 py-3 rounded-xl flex items-center gap-3 transition cursor-pointer ${
               activeTab === 'travel' ? 'bg-emerald-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
@@ -227,7 +417,7 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
             Transit Shuttles Desk
           </button>
           <button
-            onClick={() => setActiveTab('inquiries')}
+            onClick={() => { setActiveTab('inquiries'); setIsAdminNavigationOpen(false); }}
             className={`w-full text-left font-medium text-sm px-4 py-3 rounded-xl flex items-center justify-between transition cursor-pointer ${
               activeTab === 'inquiries' ? 'bg-emerald-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
@@ -245,7 +435,7 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
             )}
           </button>
           <button
-            onClick={() => setActiveTab('content')}
+            onClick={() => { setActiveTab('content'); setIsAdminNavigationOpen(false); }}
             className={`w-full text-left font-medium text-sm px-4 py-3 rounded-xl flex items-center gap-3 transition cursor-pointer ${
               activeTab === 'content' ? 'bg-emerald-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
@@ -254,10 +444,21 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
             Content & Reviews Editor
           </button>
 
-          <div className="border-t border-slate-800 pt-4 p-2 text-[11px] text-slate-500 font-mono leading-relaxed space-y-1 sm:col-span-2 md:col-span-3 lg:col-span-1 lg:mt-auto">
-            <p>Database: localStorage</p>
+          <div className="border-t border-slate-800 pt-4 p-2 text-[11px] text-slate-500 font-mono leading-relaxed space-y-1.5 lg:mt-auto">
+            <p>Database: localStorage (V3)</p>
             <p>Admin: rr493377@gmail.com</p>
-            <p>Server Status: Active</p>
+            
+            <button
+              onClick={() => {
+                if (confirm('Verify: Would you like to clear the entire local database cache (rooms, bookings, and inquiries) to reset the system to a clean state?')) {
+                  localStorage.clear();
+                  window.location.reload();
+                }
+              }}
+              className="mt-2 w-full bg-rose-950/40 hover:bg-rose-900/50 border border-rose-800/60 text-rose-300 py-1.5 px-3 rounded-lg text-[10px] font-bold text-center transition cursor-pointer block"
+            >
+              Clear DB Storage Cache
+            </button>
           </div>
         </nav>
 
@@ -400,27 +601,187 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
               {/* TAB 2: BOOKINGS REGISTER */}
               {activeTab === 'bookings' && (
                 <div className="space-y-6">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-slate-800 pb-4">
                     <div>
                       <h2 className="text-xl font-bold font-sans text-white">Residency Bookings Ledger</h2>
                       <p className="text-xs text-slate-400 mt-0.5">Filter, approve, clean assign, and manage all patient stays near CMC.</p>
                     </div>
                     
-                    {/* Status Tabs filter */}
-                    <div className="flex flex-wrap gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-mono">
-                      {['All', 'Pending', 'Confirmed', 'CheckedIn', 'Completed', 'Cancelled'].map((st) => (
-                        <button
-                          key={st}
-                          onClick={() => setBookingFilterStatus(st)}
-                          className={`px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer ${
-                            bookingFilterStatus === st ? 'bg-emerald-500 text-slate-950' : 'text-slate-400 hover:text-white'
-                          }`}
-                        >
-                          {st}
-                        </button>
-                      ))}
+                    <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+                      <button
+                        onClick={() => setIsManualBookingFormOpen(true)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer shadow-lg w-full sm:w-auto justify-center"
+                        id="back-office-walk-in-btn"
+                      >
+                        <Plus className="w-3.5 h-3.5" /> Book Walk-In Guest
+                      </button>
+                      
+                      {/* Status Tabs filter */}
+                      <div className="flex flex-wrap gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-mono w-full sm:w-auto">
+                        {['All', 'Pending', 'Confirmed', 'CheckedIn', 'Completed', 'Cancelled'].map((st) => (
+                          <button
+                            key={st}
+                            onClick={() => setBookingFilterStatus(st)}
+                            className={`px-2 py-1 rounded-lg font-semibold transition cursor-pointer flex-1 sm:flex-initial text-center ${
+                              bookingFilterStatus === st ? 'bg-emerald-500 text-slate-950' : 'text-slate-400 hover:text-white'
+                            }`}
+                          >
+                            {st}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
+
+                  {/* Manual Walk-in Booking centered modal form overlay */}
+                  {isManualBookingFormOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
+                      <form 
+                        onSubmit={handleSaveManualBooking}
+                        className="bg-slate-900 border border-slate-850 p-6 rounded-2xl space-y-4 shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto text-left relative animate-scale-up"
+                        id="back-office-manual-booking-form"
+                      >
+                        <div className="flex justify-between items-start border-b border-slate-800 pb-3">
+                          <div>
+                            <h3 className="font-bold text-white text-base">Register Walk-In Attendant stayed Reservation</h3>
+                            <p className="text-[11px] text-slate-400 mt-1">Manually catalog a walk-in companion or patient stay directly into the active Operations ledger.</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setIsManualBookingFormOpen(false)}
+                            className="text-slate-400 hover:text-white bg-slate-850 border border-slate-700 p-2 rounded-lg transition"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        <div className="space-y-3 font-sans">
+                          <div>
+                            <label className="block text-[10px] uppercase font-semibold text-slate-400 mb-1">Guest / Attendant Name *</label>
+                            <input
+                              type="text"
+                              required
+                              placeholder="e.g. Priyan Sen Gupta"
+                              value={manualGuestName}
+                              onChange={(e) => setManualGuestName(e.target.value)}
+                              className="w-full bg-slate-950 border border-slate-800 text-xs rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-[10px] uppercase font-semibold text-slate-400 mb-1">Attendant Phone Number *</label>
+                              <input
+                                type="tel"
+                                required
+                                placeholder="e.g. +91 98765 43210"
+                                value={manualGuestPhone}
+                                onChange={(e) => setManualGuestPhone(e.target.value)}
+                                className="w-full bg-slate-950 border border-slate-800 text-xs rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 font-mono"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] uppercase font-semibold text-slate-400 mb-1">Guest State / Origin *</label>
+                              <select
+                                value={manualGuestState}
+                                onChange={(e) => setManualGuestState(e.target.value)}
+                                className="w-full bg-slate-950 border border-slate-800 text-xs rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500"
+                              >
+                                <option value="West Bengal">West Bengal</option>
+                                <option value="Bangladesh">Bangladesh</option>
+                                <option value="Assam">Assam</option>
+                                <option value="Tripura">Tripura</option>
+                                <option value="Jharkhand">Jharkhand</option>
+                                <option value="Odisha font">Odisha</option>
+                                <option value="Bihar">Bihar</option>
+                                <option value="Tamil Nadu">Tamil Nadu</option>
+                                <option value="Karnataka">Karnataka</option>
+                                <option value="Kerala">Kerala</option>
+                                <option value="Other Area">Other Area</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-[10px] uppercase font-semibold text-slate-400 mb-1">Planned Check-In *</label>
+                              <input
+                                type="date"
+                                required
+                                value={manualCheckIn}
+                                onChange={(e) => setManualCheckIn(e.target.value)}
+                                className="w-full bg-slate-950 border border-slate-800 text-xs rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 font-mono"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] uppercase font-semibold text-slate-400 mb-1">Planned Check-Out *</label>
+                              <input
+                                type="date"
+                                required
+                                value={manualCheckOut}
+                                onChange={(e) => setManualCheckOut(e.target.value)}
+                                className="w-full bg-slate-950 border border-slate-800 text-xs rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 font-mono"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-[10px] uppercase font-semibold text-slate-400 mb-1">Desired Room Category *</label>
+                              <select
+                                value={manualRoomCategory}
+                                onChange={(e) => setManualRoomCategory(e.target.value)}
+                                className="w-full bg-slate-950 border border-slate-800 text-xs rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                              >
+                                <option value="Non-AC Single Room">Non-AC Single Room</option>
+                                <option value="AC Single Room">AC Single Room</option>
+                                <option value="Non-AC Double Room with Balcony">Non-AC Double Room with Balcony</option>
+                                <option value="AC Double Room">AC Double Room</option>
+                                <option value="AC Deluxe Suite with Kitchenette">AC Deluxe Suite with Kitchenette</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] uppercase font-semibold text-slate-400 mb-1">CMC Patient Card No / UHID No</label>
+                              <input
+                                type="text"
+                                placeholder="e.g. CMC892211"
+                                value={manualPatientCardNo}
+                                onChange={(e) => setManualPatientCardNo(e.target.value)}
+                                className="w-full bg-slate-950 border border-slate-800 text-xs rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 font-mono"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] uppercase font-semibold text-slate-400 mb-1">Companion Attendant Details & Notes</label>
+                            <textarea
+                              rows={2}
+                              placeholder="e.g. Attending with family, wants to use shared self-cooking stove kitchen."
+                              value={manualSpecialInstructions}
+                              onChange={(e) => setManualSpecialInstructions(e.target.value)}
+                              className="w-full bg-slate-950 border border-slate-800 text-xs rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex justify-end gap-2 pt-3 border-t border-slate-800">
+                          <button
+                            type="button"
+                            onClick={() => setIsManualBookingFormOpen(false)}
+                            className="bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-350 px-4 py-2 rounded-xl text-xs font-semibold transition"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="bg-blue-600 hover:bg-blue-550 text-white font-bold px-5 py-2 rounded-xl text-xs transition"
+                          >
+                            Create Active Reservation
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
 
                   {activeBookings.length === 0 ? (
                     <div className="bg-slate-950 rounded-2xl py-12 text-center border border-slate-800 text-slate-400 text-sm">
@@ -609,95 +970,337 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
                   )}
                 </div>
               )}
-
-              {/* TAB 3: ROOM AVAILABILITY MATRIX */}
+                   {/* TAB 3: ROOM AVAILABILITY MATRIX */}
               {activeTab === 'rooms' && (
-                <div className="space-y-6">
-                  <div>
-                    <h2 className="text-xl font-bold font-sans text-white">Guest Room Matrix Controls</h2>
-                    <p className="text-xs text-slate-400 mt-0.5">Toggle live status parameters, manage cleaning tasks and update room pricing.</p>
+                <div className="space-y-6 animate-scale-up">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                      <h2 className="text-xl font-bold font-sans text-white">Guest Room Catalog & Matrix Controls</h2>
+                      <p className="text-xs text-slate-400 mt-0.5">Add, Edit, or Remove rooms from the live booking inventory, and manage immediate override status parameters.</p>
+                    </div>
+                    <button
+                      onClick={handleOpenCreateRoom}
+                      className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer shadow-lg"
+                      id="admin-btn-add-room"
+                    >
+                      <Plus className="w-4 h-4" /> Add New Guest Room
+                    </button>
                   </div>
 
+                  {/* Beautiful Screen-Centered Modal Form for Room Creation / Editing */}
+                  {isRoomFormOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
+                      <form 
+                        onSubmit={handleSaveRoomCatalogItem} 
+                        className="bg-slate-900 border border-slate-800/80 p-6 sm:p-7 rounded-2xl space-y-5 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scale-up text-left relative"
+                        id="admin-room-catalog-form"
+                      >
+                        <div className="flex justify-between items-start border-b border-slate-800 pb-3">
+                          <div>
+                            <h3 className="font-bold text-white text-base">
+                              {roomFormMode === 'create' ? 'Create Guest Room Catalog Entry' : `Configure Catalog Settings — Room ${roomFormNumber}`}
+                            </h3>
+                            <p className="text-[11px] text-slate-400 mt-1">Specify specifications, room capacity, rent rates, features, and direct interior photography.</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setIsRoomFormOpen(false)}
+                            className="text-slate-400 hover:text-white bg-slate-800 border border-slate-700 p-2 rounded-lg transition"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div>
+                            <label className="block text-[10px] uppercase font-semibold text-slate-400 mb-1">Room Number *</label>
+                            <input
+                              type="text"
+                              required
+                              placeholder="e.g. 104 or 203"
+                              value={roomFormNumber}
+                              onChange={(e) => setRoomFormNumber(e.target.value)}
+                              className="w-full bg-slate-950 border border-slate-800 text-xs rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] uppercase font-semibold text-slate-400 mb-1">Room Category *</label>
+                            <select
+                              value={roomFormCategory}
+                              onChange={(e) => setRoomFormCategory(e.target.value)}
+                              className="w-full bg-slate-950 border border-slate-800 text-xs rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                            >
+                              <option value="Non-AC Single Room font">Non-AC Single Room</option>
+                              <option value="AC Single Room font">AC Single Room</option>
+                              <option value="Non-AC Double Room with Balcony">Non-AC Double Room with Balcony</option>
+                              <option value="AC Double Room">AC Double Room</option>
+                              <option value="AC Deluxe Suite with Kitchenette">AC Deluxe Suite with Kitchenette</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] uppercase font-semibold text-slate-400 mb-1">Status Override State *</label>
+                            <select
+                              value={roomFormStatus}
+                              onChange={(e) => setRoomFormStatus(e.target.value as any)}
+                              className="w-full bg-slate-950 border border-slate-800 text-xs rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                            >
+                              <option value="Available">Available</option>
+                              <option value="Occupied">Occupied</option>
+                              <option value="Cleaning">Cleaning</option>
+                              <option value="Maintenance">Maintenance</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] uppercase font-semibold text-slate-400 mb-1">Daily Rent (Price in INR) *</label>
+                            <input
+                              type="number"
+                              required
+                              min={0}
+                              value={roomFormPricePerDay}
+                              onChange={(e) => setRoomFormPricePerDay(Number(e.target.value))}
+                              className="w-full bg-slate-950 border border-slate-800 text-xs rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] uppercase font-semibold text-slate-400 mb-1">Adult Capacity (Number of Guests) *</label>
+                            <input
+                              type="number"
+                              required
+                              min={1}
+                              value={roomFormCapacity}
+                              onChange={(e) => setRoomFormCapacity(Number(e.target.value))}
+                              className="w-full bg-slate-950 border border-slate-800 text-xs rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] uppercase font-semibold text-slate-400 mb-1">Beds Specification *</label>
+                            <input
+                              type="text"
+                              required
+                              placeholder="e.g. 2 Single Beds or 1 King Bed"
+                              value={roomFormBeds}
+                              onChange={(e) => setRoomFormBeds(e.target.value)}
+                              className="w-full bg-slate-950 border border-slate-800 text-xs rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] uppercase font-semibold text-slate-400 mb-1">Features & Amenities (Comma-separated List)</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Air Conditioning, Shared Kitchen Setup, Smart TV, Balcony Access, RO Purifier"
+                            value={roomFormAmenities}
+                            onChange={(e) => setRoomFormAmenities(e.target.value)}
+                            className="w-full bg-slate-950 border border-slate-800 text-xs rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                          />
+                        </div>
+
+                        {/* Direct File Upload & Preview Section */}
+                        <div className="space-y-1.5">
+                          <label className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">Direct Interior Photo Upload *</label>
+                          <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
+                            {/* Live preview container */}
+                            <div className="sm:col-span-2 border border-slate-800 rounded-xl overflow-hidden bg-slate-950 flex flex-col items-center justify-center relative p-1.5 h-36">
+                              {roomFormImgUrl ? (
+                                <>
+                                  <img 
+                                    src={roomFormImgUrl} 
+                                    alt="Live Room Preview" 
+                                    className="w-full h-full object-cover rounded-lg"
+                                    referrerPolicy="no-referrer"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => setRoomFormImgUrl('')}
+                                    className="absolute top-1.5 right-1.5 bg-slate-950/80 border border-slate-800 hover:bg-rose-900 text-slate-200 p-1 rounded-md text-xs transition"
+                                    title="Clear image"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </>
+                              ) : (
+                                <div className="text-center text-slate-600 p-2">
+                                  <svg className="w-7 h-7 mx-auto mb-1 opacity-30 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                  </svg>
+                                  <span className="text-[9px] font-mono block">No photo specified</span>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Drag-and-drop upload zone */}
+                            <div 
+                              onDragOver={(e) => { e.preventDefault(); setRoomImgDragOver(true); }}
+                              onDragLeave={() => setRoomImgDragOver(false)}
+                              onDrop={handleRoomImgDrop}
+                              onClick={() => document.getElementById('room-file-upload-input')?.click()}
+                              className={`sm:col-span-3 border-2 border-dashed rounded-xl p-3 flex flex-col items-center justify-center text-center cursor-pointer transition ${
+                                roomImgDragOver 
+                                  ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400' 
+                                  : 'border-slate-800 bg-slate-950/45 hover:bg-slate-900/60 hover:border-slate-700 text-slate-400'
+                              }`}
+                            >
+                              <input
+                                type="file"
+                                id="room-file-upload-input"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    processRoomImageFile(file);
+                                  }
+                                }}
+                              />
+                              <Upload className="w-5 h-5 mb-1 text-slate-500" />
+                              <p className="text-[11px] font-semibold text-slate-200">
+                                {roomImgDragOver ? 'Drop to upload!' : 'Drag & drop room image file'}
+                              </p>
+                              <p className="text-[9px] text-slate-500 mt-0.5">or click to pick from computer</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] uppercase font-semibold text-slate-400 mb-1">Detailed Marketing Description</label>
+                          <textarea
+                            rows={2}
+                            placeholder="e.g. Cozy space adjacent to the active shared Bengali stove setup. Completely clean and dustbin cleared daily."
+                            value={roomFormDescription}
+                            onChange={(e) => setRoomFormDescription(e.target.value)}
+                            className="w-full bg-slate-950 border border-slate-800 text-xs rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                          />
+                        </div>
+
+                        <div className="flex justify-end gap-2 pt-3 border-t border-slate-800">
+                          <button
+                            type="button"
+                            onClick={() => setIsRoomFormOpen(false)}
+                            className="bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-350 px-4 py-2 rounded-xl text-xs font-semibold transition"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-5 py-2 rounded-xl text-xs transition"
+                          >
+                            {roomFormMode === 'create' ? 'Publish Room to Inventory' : 'Save Catalog Configuration'}
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+
+                  {/* Rooms Cards Inventory Display */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {rooms.map((room) => (
                       <div 
                         key={room.id}
-                        className="bg-slate-950 border border-slate-800/80 rounded-xl overflow-hidden shadow-md"
+                        className="bg-slate-950 border border-slate-800/80 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700/80 transition flex flex-col"
                       >
-                        <div className="p-4 bg-slate-900 flex justify-between items-center border-b border-slate-800/50">
-                          <div>
-                            <span className="text-lg font-black font-sans text-white">Room {room.roomNumber}</span>
-                            <span className="text-[10px] font-mono text-slate-400 ml-2">({room.category})</span>
+                        {/* Room Visual Hero Card Header */}
+                        <div className="relative h-44 w-full bg-slate-900 shrink-0">
+                          <img 
+                            src={room.imgUrl || 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=600&q=80'} 
+                            alt={`Room ${room.roomNumber}`}
+                            referrerPolicy="no-referrer"
+                            className="w-full h-full object-cover opacity-85"
+                          />
+                          <div className="absolute top-3 left-3 bg-slate-950/80 backdrop-blur border border-slate-800 px-2.5 py-1 rounded-lg">
+                            <span className="text-sm font-black font-sans text-white">Room {room.roomNumber}</span>
+                          </div>
+                          <div className="absolute top-3 right-3">
+                            <span className={`px-2.5 py-1 text-[10px] font-mono rounded-lg font-black uppercase tracking-wider backdrop-blur bg-opacity-80 border ${
+                              room.status === 'Available' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
+                              room.status === 'Occupied' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' :
+                              room.status === 'Cleaning' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
+                              'bg-slate-800 text-slate-300 border-slate-700'
+                            }`}>
+                              {room.status}
+                            </span>
                           </div>
 
-                          <span className={`px-2 py-0.5 text-[10px] font-mono rounded font-black uppercase text-center ${
-                            room.status === 'Available' ? 'bg-emerald-500/20 text-emerald-400' :
-                            room.status === 'Occupied' ? 'bg-amber-500/20 text-amber-400' :
-                            room.status === 'Cleaning' ? 'bg-blue-500/20 text-blue-400' :
-                            'bg-slate-700 text-slate-300'
-                          }`}>
-                            {room.status}
-                          </span>
+                          <div className="absolute bottom-3 left-3 right-3 bg-slate-950/85 backdrop-blur-sm p-2 rounded-xl border border-slate-850/40">
+                            <p className="text-[11px] font-bold text-slate-300 truncate font-sans">{room.category}</p>
+                          </div>
                         </div>
 
-                        <div className="p-4 space-y-4">
-                          <div className="flex gap-4 text-xs font-mono">
-                            <div>
-                              <p className="text-slate-500 text-[10px] uppercase">Daily Rent</p>
-                              {editingRoomId === room.id ? (
-                                <div className="flex items-center gap-1.5 mt-1 animate-scale-up">
-                                  <span className="text-slate-400">₹</span>
-                                  <input
-                                    type="number"
-                                    value={newRoomPrice}
-                                    onChange={(e) => setNewRoomPrice(Number(e.target.value))}
-                                    className="bg-slate-900 border border-slate-700 rounded text-xs px-1.5 py-0.5 w-16 text-white text-center focus:outline-none"
-                                  />
-                                  <button
-                                    onClick={() => handlePriceUpdate(room.id)}
-                                    className="bg-emerald-500 text-slate-950 p-1 rounded hover:bg-emerald-400 transition"
-                                  >
-                                    <Check className="w-3.5 h-3.5" />
-                                  </button>
-                                </div>
-                              ) : (
-                                <p className="font-bold text-white flex items-center gap-1.5 mt-1">
-                                  ₹{room.pricePerDay}
-                                  <button
-                                    onClick={() => {
-                                      setEditingRoomId(room.id);
-                                      setNewRoomPrice(room.pricePerDay);
-                                    }}
-                                    className="text-slate-500 hover:text-emerald-400"
-                                  >
-                                    <Edit2 className="w-3 h-3" />
-                                  </button>
-                                </p>
-                              )}
+                        <div className="p-4 space-y-4 flex-1 flex flex-col justify-between">
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-start gap-4 text-xs font-mono">
+                              <div>
+                                <p className="text-slate-500 text-[10px] uppercase font-semibold">Daily Rent</p>
+                                <p className="font-bold text-white text-base mt-0.5">₹{room.pricePerDay}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-slate-500 text-[10px] uppercase font-semibold">Sleeping Layout</p>
+                                <p className="text-slate-300 mt-0.5">{room.beds} (👥 Max {room.capacity})</p>
+                              </div>
                             </div>
 
-                            <div>
-                              <p className="text-slate-500 text-[10px] uppercase font-mono">Beds & capacity</p>
-                              <p className="text-slate-300 mt-1">{room.beds} (👥 Max {room.capacity})</p>
+                            {room.description && (
+                              <p className="text-slate-400 text-xs font-light font-sans line-clamp-2 leading-relaxed italic">
+                                "{room.description}"
+                              </p>
+                            )}
+
+                            {/* Amenities Tag Cloud */}
+                            <div className="border-t border-slate-900 pt-3">
+                              <p className="text-slate-505 uppercase font-semibold font-mono text-[9px] tracking-wider mb-1.5">Amenities Included</p>
+                              <div className="flex flex-wrap gap-1">
+                                {room.amenities.map((amenity, idx) => (
+                                  <span 
+                                    key={idx}
+                                    className="bg-slate-900 border border-slate-850 text-slate-400 text-[9px] px-2 py-0.5 rounded"
+                                  >
+                                    {amenity}
+                                  </span>
+                                ))}
+                              </div>
                             </div>
                           </div>
 
-                          <div className="border-t border-slate-900 pt-3">
-                            <p className="text-slate-500 uppercase font-mono text-[10px] mb-2">Manual Service Status Override</p>
-                            <div className="grid grid-cols-4 gap-1.5 text-[10px] font-mono">
-                              {(['Available', 'Occupied', 'Cleaning', 'Maintenance'] as const).map((st) => (
-                                <button
-                                  key={st}
-                                  onClick={() => handleRoomStatusChange(room.id, st)}
-                                  className={`py-1 rounded text-center transition cursor-pointer hover:font-bold ${
-                                    room.status === st 
-                                      ? 'bg-slate-800 text-emerald-400 border border-slate-700' 
-                                      : 'bg-slate-900 text-slate-400 border border-transparent hover:border-slate-800'
-                                  }`}
-                                >
-                                  {st === 'Maintenance' ? 'Maint' : st}
-                                </button>
-                              ))}
+                          <div className="space-y-3 pt-3 border-t border-slate-900 shrink-0">
+                            <div>
+                              <p className="text-slate-500 uppercase font-semibold font-mono text-[10px] mb-1.5 font">Change Status</p>
+                              <div className="grid grid-cols-4 gap-1 text-[9px] font-mono">
+                                {(['Available', 'Occupied', 'Cleaning', 'Maintenance'] as const).map((st) => (
+                                  <button
+                                    key={st}
+                                    onClick={() => handleRoomStatusChange(room.id, st)}
+                                    className={`py-1 rounded text-center transition cursor-pointer hover:font-bold ${
+                                      room.status === st 
+                                        ? 'bg-slate-850 text-emerald-400 border border-slate-700' 
+                                        : 'bg-slate-900 text-slate-500 border border-transparent hover:border-slate-800'
+                                    }`}
+                                  >
+                                    {st === 'Maintenance' ? 'Maint' : st}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Catalog Action buttons: Edit and Delete */}
+                            <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-900/45">
+                              <button
+                                onClick={() => handleOpenEditRoom(room)}
+                                className="bg-slate-900 hover:bg-slate-850 hover:text-emerald-400 text-slate-300 border border-slate-800 px-3 py-1.5 rounded-xl text-xs transition flex items-center justify-center gap-1 flex-1 cursor-pointer"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" /> Configure Catalog
+                              </button>
+                              <button
+                                onClick={() => handleDeleteRoomFromCatalog(room.id)}
+                                className="bg-slate-900 hover:bg-rose-950/40 hover:text-rose-400 text-slate-500 border border-slate-800 p-2 rounded-xl transition cursor-pointer"
+                                title="Delete Room Completely"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
                             </div>
                           </div>
                         </div>

@@ -7,11 +7,11 @@ import { GuestRoom, Booking, TravelService, ContactInquiry, Testimonial } from '
 
 // Robust local storage keys
 const KEYS = {
-  ROOMS: 'SEENU_ROOMS_V2',
-  BOOKINGS: 'SEENU_BOOKINGS_V2',
-  TRAVEL: 'SEENU_TRAVEL_V2',
-  INQUIRIES: 'SEENU_INQUIRIES_V2',
-  TESTIMONIALS: 'SEENU_TESTIMONIALS_V2'
+  ROOMS: 'SEENU_ROOMS_V3',
+  BOOKINGS: 'SEENU_BOOKINGS_V3',
+  TRAVEL: 'SEENU_TRAVEL_V3',
+  INQUIRIES: 'SEENU_INQUIRIES_V3',
+  TESTIMONIALS: 'SEENU_TESTIMONIALS_V3'
 };
 
 // Seed Rooms
@@ -90,89 +90,8 @@ const DEFAULT_ROOMS: GuestRoom[] = [
   }
 ];
 
-// Seed Bookings
-const DEFAULT_BOOKINGS: Booking[] = [
-  {
-    id: 'booking-1001',
-    guestName: 'Animesh Mukhopadhyay',
-    guestPhone: '+91 94330 12345',
-    guestEmail: 'animesh.m@gmail.com',
-    guestState: 'West Bengal',
-    patientCardNo: 'CMC-789210-B',
-    roomCategory: 'AC Double Room',
-    assignedRoomId: 'room-202',
-    checkInDate: '2026-06-12',
-    checkOutDate: '2026-06-27', // 15 days
-    status: 'CheckedIn',
-    totalAmount: 16200, // 1200 * 15 = 18000, 10% discount = 16200
-    needTravelAssistance: true,
-    travelDetails: {
-      pickupPoint: 'Chennai Airport',
-      pickupTime: '2026-06-12 14:00',
-      flightOrTrainNo: '6E-2435 Indigo'
-    },
-    specialInstructions: 'Patient needs a wheelchair at arrival. Self-kitchen setup used daily for cooking light Bengali meals.',
-    createdAt: '2026-06-10T11:30:00Z'
-  },
-  {
-    id: 'booking-1002',
-    guestName: 'Kamesh Nair',
-    guestPhone: '+91 98450 67890',
-    guestEmail: 'kameshnair@gmail.com',
-    guestState: 'Kerala',
-    patientCardNo: 'CMC-103452-Y',
-    roomCategory: 'Non-AC Double Room with Balcony',
-    assignedRoomId: 'room-103',
-    checkInDate: '2026-06-14',
-    checkOutDate: '2026-06-18',
-    status: 'Confirmed',
-    totalAmount: 3200, // 800 * 4 = 3200
-    needTravelAssistance: true,
-    travelDetails: {
-      pickupPoint: 'Katpadi Railway Station',
-      pickupTime: '2026-06-14 06:15',
-      flightOrTrainNo: '12626 Kerala Express'
-    },
-    specialInstructions: 'Please arrange local auto transportation back and forth on treatment days.',
-    createdAt: '2026-06-12T15:24:00Z'
-  },
-  {
-    id: 'booking-1003',
-    guestName: 'Dr. Sanjay Agarwal',
-    guestPhone: '+91 99100 88221',
-    guestState: 'Uttar Pradesh',
-    roomCategory: 'AC Single Room',
-    status: 'Pending',
-    totalAmount: 2100, // 700 * 3 = 2100
-    needTravelAssistance: false,
-    specialInstructions: 'Visiting CMC for clinical consultation. Request clean high floor room.',
-    createdAt: '2026-06-13T18:45:00Z',
-    checkInDate: '2026-06-18',
-    checkOutDate: '2026-06-21'
-  },
-  {
-    id: 'booking-1004',
-    guestName: 'Rahim Ahsan',
-    guestPhone: '+880 1711 556677',
-    guestEmail: 'rahim.ahsan@yahoo.com',
-    guestState: 'Dhaka, Bangladesh',
-    patientCardNo: 'CMC-410398-X',
-    roomCategory: 'AC Single Room',
-    assignedRoomId: 'room-201',
-    checkInDate: '2026-06-05',
-    checkOutDate: '2026-06-13',
-    status: 'Completed',
-    totalAmount: 5600, // 700 * 8 = 5600
-    needTravelAssistance: true,
-    travelDetails: {
-      pickupPoint: 'Chennai Airport',
-      pickupTime: '2026-06-05 10:10',
-      flightOrTrainNo: 'BG-0083 Biman Bangladesh'
-    },
-    specialInstructions: 'Needs currency exchange support and active assistance with local SIM card activation.',
-    createdAt: '2026-06-01T09:20:00Z'
-  }
-];
+/// Seed Bookings
+const DEFAULT_BOOKINGS: Booking[] = [];
 
 // Seed Travel Services
 const DEFAULT_TRAVEL: TravelService[] = [
@@ -227,58 +146,10 @@ const DEFAULT_TRAVEL: TravelService[] = [
 ];
 
 // Seed Testimonials
-const DEFAULT_TESTIMONIALS: Testimonial[] = [
-  {
-    id: 't-1',
-    author: 'Debadrita Roy',
-    relation: 'Patient Daughter',
-    state: 'Kolkata, WB',
-    rating: 5,
-    text: 'Visiting Vellore from Kolkata with a cancer-diagnosed mother was highly stressful. Staying here was a lifesaver. The kitchenette facility allowed me to cook home-cooked mild meals for mom, and Murugan (cab driver) picked us up directly from Chennai airport. Absolute blessing, highly recommended!',
-    date: '2026-06-01'
-  },
-  {
-    id: 't-2',
-    author: 'Mohammad Farooq',
-    relation: 'Patient Brother',
-    state: 'Dhaka, Bangladesh',
-    rating: 5,
-    text: 'Very hygienic rooms near hospital, only 4 minutes walking. Bengali food ingredients are easily grocery shopped nearby. The owner helped our family do cash exchanges and get Indian sim card too. Translating to Tamil is easy here since guesthouse staff speak Hindi/Bengali.',
-    date: '2026-05-18'
-  },
-  {
-    id: 't-3',
-    author: 'Ranjit Shenoy',
-    relation: 'Direct outpatient',
-    state: 'Mangalore, Karnataka',
-    rating: 5,
-    text: 'Highly professional. Affordable prices. Rooms are spacious and spotless with proper hot water. The Katpadi railway booking shuttle was perfectly on-time to receive our family at 5 AM. Five stars!',
-    date: '2026-06-10'
-  }
-];
+const DEFAULT_TESTIMONIALS: Testimonial[] = [];
 
 // Seed Inquiries
-const DEFAULT_INQUIRIES: ContactInquiry[] = [
-  {
-    id: 'inq-1',
-    name: 'Shreya Sengupta',
-    phone: '+91 90070 33445',
-    email: 'shreya.sen@gmail.com',
-    subject: 'Room availability for long term stay (1.5 months)',
-    message: 'Hello, our family is coming to Vellore for radiation treatment of 6 weeks. Do you have discounts for long-term monthly bookings (from July 5th)? Kitchen access is mandatory. Also require airport pickup. Please advise.',
-    isRead: false,
-    createdAt: '2026-06-13T10:15:00Z'
-  },
-  {
-    id: 'inq-2',
-    name: 'Balachandran R.',
-    phone: '+91 94432 99011',
-    subject: 'Wheelchair assistance',
-    message: 'Do you have wheelchair ramp access from the main street to the ground floor room? My father is scheduled for orthopedic checkup next week on Wednesday. Looking to book room 101.',
-    isRead: true,
-    createdAt: '2026-06-12T14:10:00Z'
-  }
-];
+const DEFAULT_INQUIRIES: ContactInquiry[] = [];
 
 export const dbService = {
   // Initialize Database inside localStorage
@@ -304,6 +175,31 @@ export const dbService = {
   getRooms(): GuestRoom[] {
     this.init();
     return JSON.parse(localStorage.getItem(KEYS.ROOMS) || '[]');
+  },
+
+  addRoom(room: Omit<GuestRoom, 'id'>): GuestRoom {
+    const rooms = this.getRooms();
+    const newRoom: GuestRoom = {
+      ...room,
+      id: `room-${Date.now()}`
+    };
+    rooms.push(newRoom);
+    localStorage.setItem(KEYS.ROOMS, JSON.stringify(rooms));
+    return newRoom;
+  },
+
+  updateRoom(roomId: string, updatedFields: Partial<GuestRoom>): GuestRoom[] {
+    const rooms = this.getRooms();
+    const updated = rooms.map(room => room.id === roomId ? { ...room, ...updatedFields } : room);
+    localStorage.setItem(KEYS.ROOMS, JSON.stringify(updated));
+    return updated;
+  },
+
+  deleteRoom(roomId: string): GuestRoom[] {
+    const rooms = this.getRooms();
+    const filtered = rooms.filter(room => room.id !== roomId);
+    localStorage.setItem(KEYS.ROOMS, JSON.stringify(filtered));
+    return filtered;
   },
 
   updateRoomStatus(roomId: string, status: GuestRoom['status']): GuestRoom[] {
