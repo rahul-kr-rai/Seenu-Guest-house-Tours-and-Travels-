@@ -888,11 +888,11 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
                   </div>
 
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    {/* Add Testimonial simulation input */}
+                    {/* Add Guest Review form input */}
                     <form onSubmit={handleAddTestimonial} className="lg:col-span-5 bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-4">
                       <div>
-                        <h3 className="font-bold text-white text-base">Add Simulated Testimonial</h3>
-                        <p className="text-xs text-slate-400">Add reviews from recovering families directly into database.</p>
+                        <h3 className="font-bold text-white text-base">Add Guest Review</h3>
+                        <p className="text-xs text-slate-400">Add reviews from recovering families directly into your active database.</p>
                       </div>
 
                       {reviewSuccess && (
@@ -956,7 +956,7 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
                           type="submit"
                           className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-2.5 rounded-xl transition text-xs cursor-pointer"
                         >
-                          Simulate Testimonial Insertion
+                          Publish Guest Review
                         </button>
                       </div>
                     </form>

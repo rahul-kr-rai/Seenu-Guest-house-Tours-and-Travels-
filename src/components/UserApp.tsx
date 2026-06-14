@@ -651,12 +651,12 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
 
           <div className="lg:col-span-7 bg-white text-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl col-span-1">
             <h4 className="text-xl font-bold text-slate-900 mb-3 font-sans tracking-tight">Send Instant Inquiry Desk</h4>
-            <p className="text-gray-500 text-xs font-light mb-6">Submitted questions immediately register under the Admin Management panel inbox for validation simulator purposes.</p>
+            <p className="text-gray-500 text-xs font-light mb-6">Submitted questions immediately register under our active Operations Panel for review and scheduling.</p>
 
             {contactSuccess && (
               <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-xl text-sm font-semibold flex gap-2 items-center mb-6 animate-scale-up">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-                <span>Your query has been recorded. Verify it inside the "Admin Dashboard Office" above!</span>
+                <span>Your query has been recorded successfully. Our desk coordinators will get back to you shortly!</span>
               </div>
             )}
 
@@ -736,7 +736,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
       <footer className="bg-slate-950 text-slate-400 py-8 border-t border-slate-800 text-xs text-center z-10 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
           <p className="font-medium text-slate-300">
-            © {new Date().getFullYear()} Seenu Guest House, Tour's and Travels. All hospital assistance, pickup logs, room statuses, and schedules simulation-only.
+            © {new Date().getFullYear()} Seenu Guest House, Tour's and Travels. All hospital assistance, pickup logs, room statuses, and schedules managed securely in real-time.
           </p>
           <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4 text-slate-500">
             <span>Walking distance to Christian Medical College (CMC), Vellore | Near Gate 1</span>
