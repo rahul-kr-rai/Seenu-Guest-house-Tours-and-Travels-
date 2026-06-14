@@ -13,7 +13,7 @@ import {
   Tv, Wifi, Flame, HeartPulse, ChevronRight,
   Phone, Globe, CheckCircle2, Star, Send, 
   HelpCircle, MessageSquare, ClipboardCheck, ArrowRight, MapPin,
-  MessageCircle, Menu, X
+  MessageCircle, Menu, X, Calculator, Plus, Minus, Car, Award
 } from 'lucide-react';
 
 interface UserAppProps {
@@ -27,6 +27,11 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [selectedRoomCat, setSelectedRoomCat] = useState('Non-AC Single Room');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Hero interactive stay planner states
+  const [heroRoomCat, setHeroRoomCat] = useState('Non-AC Single Room');
+  const [heroDays, setHeroDays] = useState(5);
+  const [heroTransit, setHeroTransit] = useState('none');
 
   // Contact form state
   const [senderName, setSenderName] = useState('');
@@ -205,94 +210,272 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
         )}
       </header>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-12 pb-20 md:py-24 bg-gradient-to-tr from-[#1e293b] via-slate-900 to-slate-950 text-white">
-        {/* Subtle background graphics */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_60%_-20%,rgba(59,130,246,0.15),transparent)] pointer-events-none" />
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
-          <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3.5 py-1.5 rounded-full text-xs font-mono uppercase tracking-widest font-semibold">
-              ✨ 180 Meters to CMC Entrance Gate 1
-            </div>
-            
-            <h2 className="text-3xl md:text-5xl font-extrabold font-sans tracking-tight leading-tight">
-              A Peaceful Recovery Stay <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-emerald-300">With Multilingual Patient Transit</span>
-            </h2>
-            
-            <p className="text-slate-300 text-sm md:text-base leading-relaxed max-w-xl font-light">
-              We provide clean, hygienic guesthouse rooms and custom travel logistics customized strictly for patients and accompanying relatives visiting CMC Vellore. Relax in a noise-insulated environment, complete with shared self-cooking kitchen utilities and 24/7 airport terminal pickup support.
-            </p>
+      {/* Redesigned Premium Hero Section with Split-interactive design */}
+      <section className="relative overflow-hidden pt-12 pb-20 lg:pt-16 lg:pb-28 bg-gradient-to-br from-slate-50 via-blue-50/20 to-white">
+        {/* Subtle decorative mesh background and glowing active elements */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-b from-blue-300/10 to-indigo-300/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-10 left-10 w-[300px] h-[300px] bg-emerald-400/5 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_80%,transparent_100%)] opacity-40 pointer-events-none" />
 
-            {/* Quick Benefits Badges */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
-              <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-xs text-slate-200">
-                <Utensils className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Self-Cooking Kitchen</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-xs text-slate-200">
-                <Languages className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Bengali / Hindi help</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-xs text-slate-200">
-                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>RO Purified Water</span>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <button
-                onClick={() => handleBookingStart('Non-AC Single Room')}
-                className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-8 py-3.5 rounded-xl text-center shadow-md transition duration-200 flex items-center justify-center gap-2 cursor-pointer"
-              >
-                Book Accommodation & Transit
-                <ArrowRight className="w-5 h-5 text-slate-950" />
-              </button>
-              <button
-                onClick={() => scrollToSection('rooms-section')}
-                className="bg-white/10 hover:bg-white/15 text-white border border-white/20 font-semibold px-6 py-3.5 rounded-xl text-center transition duration-200 cursor-pointer"
-              >
-                View Rooms & Rates
-              </button>
-            </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
             
-            <p className="text-xs text-slate-400 font-mono tracking-tight">
-              📞 Direct Enquiry Hotline over WhatsApp: +91 94441 55662
-            </p>
-          </div>
+            {/* Left Column: Bold Typographic & Core Features Panel */}
+            <div className="lg:col-span-6 space-y-6 md:space-y-8 text-left lg:pt-4">
+              
+              {/* Distance announcement label */}
+              <div className="inline-flex items-center gap-2.5 bg-blue-50 border border-blue-150 px-3.5 py-1.5 rounded-full shadow-xs">
+                <span className="flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+                </span>
+                <span className="text-[11px] font-bold font-mono text-blue-700 tracking-wider uppercase">
+                  180m Flat Walk to CMC Scudder Gate 1
+                </span>
+              </div>
 
-          {/* Gorgeous Hero Showcase collage */}
-          <div className="relative">
-            <div className="aspect-[4/3] bg-slate-900 rounded-2xl overflow-hidden border-2 border-slate-700/50 shadow-xl relative">
-              <img 
-                src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=1200&q=80" 
-                alt="Hospital Recovery Room stay"
-                className="w-full h-full object-cover opacity-90 transition hover:scale-105 duration-1000"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent flex flex-col justify-end p-6">
-                <div className="bg-[#1e293b]/95 border border-slate-700/60 p-4 rounded-xl max-w-sm self-start">
-                  <div className="flex items-center gap-1 text-emerald-400">
-                    <Star className="w-4 h-4 fill-emerald-400" />
-                    <Star className="w-4 h-4 fill-emerald-400" />
-                    <Star className="w-4 h-4 fill-emerald-400" />
-                    <Star className="w-4 h-4 fill-emerald-400" />
-                    <Star className="w-4 h-4 fill-emerald-400" />
-                    <span className="text-xs font-mono font-bold text-white ml-2">4.9/5 Rating</span>
+              {/* Title & Introduction */}
+              <div className="space-y-4">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-black font-sans tracking-tight text-slate-900 leading-tight">
+                  Premium Patient Stay & <br/>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-600">
+                    Multilingual Logistics
+                  </span>
+                </h2>
+                <p className="text-slate-600 text-sm sm:text-base md:text-lg leading-relaxed font-light max-w-xl">
+                  We render spotless, noise-insulated lodgings tailored purposefully for recovering patients and accompanying relatives visiting Christian Medical College (CMC) Vellore. Relax with access to custom meal self-cooking kitchens, 24/7 airport dispatch desks, and fluent Bengali/Hindi support coordinators.
+                </p>
+              </div>
+
+              {/* Key Trust Badges inline layout */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex gap-3 bg-white border border-slate-100 p-3.5 rounded-2xl shadow-xs">
+                  <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl h-fit">
+                    <Utensils className="w-4 h-4" />
                   </div>
-                  <p className="text-xs text-slate-300 font-light mt-1.5 italic leading-relaxed">
-                    "Only a 2-minute flat walk to Scudder road Gate 1. Spotless bed linen, lift, and incredibly warm reception helper."
-                  </p>
-                  <p className="text-xs text-emerald-300 font-semibold mt-1 font-mono text-right">— Dr. Roy, Dhaka</p>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-800">Dietary Kitchens</h4>
+                    <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">Induction stoves & pure RO water for user meals.</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 bg-white border border-slate-100 p-3.5 rounded-2xl shadow-xs">
+                  <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl h-fit">
+                    <Languages className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-800">Assistance Desk</h4>
+                    <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">Speak fluent Bengali, Hindi, and Malayalam natively.</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 bg-white border border-slate-100 p-3.5 rounded-2xl shadow-xs">
+                  <div className="p-2 bg-blue-50 text-blue-600 rounded-xl h-fit">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-800">Sanitized Rooms</h4>
+                    <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">Deep sanitization before every check-in.</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 bg-white border border-slate-100 p-3.5 rounded-2xl shadow-xs">
+                  <div className="p-2 bg-amber-50 text-amber-600 rounded-xl h-fit">
+                    <Award className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-800">Top Rated</h4>
+                    <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">4.9/5 patient satisfaction over 140+ bookings.</p>
+                  </div>
                 </div>
               </div>
+
+              {/* Direct helpline buttons instead of standalone text */}
+              <div className="flex flex-wrap items-center gap-4 pt-2">
+                <button 
+                  onClick={() => scrollToSection('rooms-section')}
+                  className="bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold px-5 py-3 rounded-xl transition cursor-pointer flex items-center gap-1.5"
+                >
+                  Browse Room Gallery
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+                <div className="flex items-center gap-2 text-xs font-mono">
+                  <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span className="text-slate-500">Helpline WhatsApp:</span>
+                  <a href="https://wa.me/919444155662" target="_blank" rel="noopener noreferrer" className="font-extrabold text-slate-800 hover:text-blue-600 hover:underline">
+                    +91 94441 55662
+                  </a>
+                </div>
+              </div>
+
             </div>
-            
-            {/* Float badge */}
-            <div className="absolute -top-4 -right-4 bg-emerald-500 text-slate-950 px-4 py-2 rounded-xl shadow-md font-mono font-black text-xs uppercase animate-bounce space-x-1">
-              <span>🩺 Patients Favorite</span>
+
+            {/* Right Column: High-fidelity interactive stay calculator planner */}
+            <div className="lg:col-span-6 bg-white border border-slate-200/80 rounded-3xl p-6 shadow-xl relative w-full">
+              
+              {/* Decorative top title for the interactive assistant */}
+              <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
+                    <Calculator className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-800">Instant Estimate Calculator</h3>
+                    <p className="text-[10px] text-slate-400 font-mono">Set values to view dynamic calculations</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-150 px-2 py-0.5 rounded-full font-mono uppercase font-black tracking-wider animate-pulse">
+                    Live Rates
+                  </span>
+                </div>
+              </div>
+
+              {/* Step 1: Room Category selection */}
+              <div className="space-y-2 mb-4">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider font-mono block">1. Select Room Tier</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { cat: 'Non-AC Single Room', label: 'Single Non-AC', price: 450, info: 'Perfect for patient + 1 guest' },
+                    { cat: 'Non-AC Family Room', label: 'Family Non-AC', price: 750, info: 'Spacious, induction cook' },
+                    { cat: 'Standard AC Room', label: 'Standard AC', price: 1150, info: 'Cool recovery, geyser, TV' },
+                    { cat: 'Premium Kitchen Suite', label: 'Kitchen Suite', price: 1650, info: 'Exclusive private kitchen' }
+                  ].map((tier) => (
+                    <button
+                      key={tier.cat}
+                      onClick={() => setHeroRoomCat(tier.cat)}
+                      className={`text-left p-3 rounded-2xl border text-xs transition duration-250 cursor-pointer ${
+                        heroRoomCat === tier.cat
+                          ? 'bg-blue-50/65 border-blue-500 ring-2 ring-blue-500/10'
+                          : 'bg-slate-50/50 hover:bg-slate-100 border-slate-200 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex justify-between items-center font-bold">
+                        <span className={heroRoomCat === tier.cat ? 'text-blue-700 font-bold' : 'text-slate-700 font-semibold'}>{tier.label}</span>
+                        <span className="font-mono text-[10px] text-emerald-600">₹{tier.price}/d</span>
+                      </div>
+                      <p className="text-[9px] text-slate-450 leading-tight mt-1 font-light">{tier.info}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Step 2: Duration slider/selector */}
+              <div className="space-y-2.5 mb-4 p-3.5 bg-slate-50/70 border border-slate-105 rounded-2xl">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="font-bold text-slate-500 uppercase tracking-wider font-mono">2. Stay Duration</span>
+                  <span className="font-mono font-black text-blue-600 bg-white border border-blue-100 px-2.5 py-0.5 rounded-lg text-xs">
+                    {heroDays} Days
+                  </span>
+                </div>
+                
+                {/* Range bar plus button increments */}
+                <div className="flex items-center gap-3">
+                  <button 
+                    onClick={() => setHeroDays(Math.max(1, heroDays - 1))}
+                    className="p-1 px-2.5 bg-white border border-slate-200 rounded-lg text-xs font-black shadow-xs hover:bg-slate-100 cursor-pointer select-none"
+                  >
+                    -
+                  </button>
+                  <input 
+                    type="range" 
+                    min="1" 
+                    max="60" 
+                    value={heroDays}
+                    onChange={(e) => setHeroDays(parseInt(e.target.value) || 1)}
+                    className="flex-1 accent-blue-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg appearance-none"
+                  />
+                  <button 
+                    onClick={() => setHeroDays(Math.min(90, heroDays + 1))}
+                    className="p-1 px-2.5 bg-white border border-slate-200 rounded-lg text-xs font-black shadow-xs hover:bg-slate-100 cursor-pointer select-none"
+                  >
+                    +
+                  </button>
+                </div>
+                
+                {/* Duration Pre-selectors for easy clicking */}
+                <div className="flex gap-1.5 justify-between">
+                  {[3, 7, 14, 30].map((days) => (
+                    <button
+                      key={days}
+                      onClick={() => setHeroDays(days)}
+                      className={`flex-1 text-[10px] font-semibold py-1 rounded-lg border transition cursor-pointer ${
+                        heroDays === days 
+                          ? 'bg-blue-600 text-white border-blue-600 font-bold' 
+                          : 'bg-white hover:bg-slate-50 text-slate-500 border-slate-200'
+                      }`}
+                    >
+                      {days} {days === 30 ? 'Days (Month)' : `Days`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Step 3: Airport Transit Pickup select */}
+              <div className="space-y-2 mb-5">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider font-mono block">3. Add Private Station/Airport Cab</label>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {[
+                    { key: 'none', label: 'No Cab', info: 'Self Transit' },
+                    { key: 'katpadi', label: 'Katpadi', info: '₹350 Cab' },
+                    { key: 'chennai', label: 'Chennai', info: '₹3.5k Taxi' },
+                    { key: 'bangalore', label: 'Bangalore', info: '₹6k Taxi' }
+                  ].map((opt) => (
+                    <button
+                      key={opt.key}
+                      onClick={() => setHeroTransit(opt.key)}
+                      className={`text-center py-2.5 px-1 rounded-xl border transition cursor-pointer ${
+                        heroTransit === opt.key 
+                          ? 'bg-emerald-50/70 border-emerald-500 ring-2 ring-emerald-500/5 font-bold' 
+                          : 'bg-slate-50/40 border-slate-150 hover:bg-slate-100'
+                      }`}
+                    >
+                      <div className={`text-[11px] ${heroTransit === opt.key ? 'text-emerald-800 font-bold' : 'text-slate-800'}`}>{opt.label}</div>
+                      <div className="text-[8px] text-slate-400 font-mono mt-0.5">{opt.info}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Real-time breakdown receipt receipt */}
+              <div className="bg-slate-900 text-slate-100 p-4 rounded-2xl font-mono text-xs space-y-1.5 shadow-inner">
+                <div className="flex justify-between text-slate-400">
+                  <span>Stay Code: {heroRoomCat}</span>
+                  <span>₹{heroRoomCat === 'Non-AC Single Room' ? 450 : heroRoomCat === 'Non-AC Family Room' ? 750 : heroRoomCat === 'Standard AC Room' ? 1150 : 1650} x {heroDays}d</span>
+                </div>
+                {heroTransit !== 'none' && (
+                  <div className="flex justify-between text-slate-400">
+                    <span>Private Pickup ({heroTransit === 'katpadi' ? 'Katpadi Stn' : heroTransit === 'chennai' ? 'Chennai Airport' : 'Blr Airport'})</span>
+                    <span>+ ₹{heroTransit === 'katpadi' ? 350 : heroTransit === 'chennai' ? 3500 : 6000}</span>
+                  </div>
+                )}
+                <div className="border-t border-slate-800 pt-1.5 flex justify-between items-center text-sm font-bold text-white">
+                  <span className="flex items-center gap-1">
+                    <span>Estimated Total:</span>
+                    <span className="text-[10px] text-blue-400 font-light normal-case">(Pay on check-in)</span>
+                  </span>
+                  <span className="text-emerald-400 font-mono text-base font-black">
+                    ₹{((heroRoomCat === 'Non-AC Single Room' ? 450 : heroRoomCat === 'Non-AC Family Room' ? 750 : heroRoomCat === 'Standard AC Room' ? 1150 : 1650) * heroDays + (heroTransit === 'none' ? 0 : heroTransit === 'katpadi' ? 350 : heroTransit === 'chennai' ? 3500 : 6000)).toLocaleString('en-IN')}
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Reserve trigger */}
+              <div className="mt-4">
+                <button
+                  onClick={() => handleBookingStart(heroRoomCat)}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-4 rounded-xl shadow-lg shadow-blue-600/10 transition duration-250 flex items-center justify-center gap-2 cursor-pointer text-sm"
+                >
+                  Confirm Choice & Pre-Book Stay
+                  <ArrowRight className="w-4.5 h-4.5" />
+                </button>
+                <p className="text-center text-[10px] text-slate-400 mt-2 font-light">
+                  Pre-booking secures the lodging assignments. Changes are acceptable at any point with instant coordination fluent in your language.
+                </p>
+              </div>
+
             </div>
+
           </div>
         </div>
       </section>

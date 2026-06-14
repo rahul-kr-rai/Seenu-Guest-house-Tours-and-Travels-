@@ -86,6 +86,7 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
       const savedAmount = Math.round((baseCost * discountPercent) / 100);
       const calculatedAmt = baseCost - savedAmount;
 
+      // Persist in local database so Manager Office Dashboard can still track demo bookings correctly!
       dbService.addBooking({
         guestName,
         guestPhone,
@@ -106,11 +107,48 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
         specialInstructions
       });
 
+      // Construct visually rich pre-filled WhatsApp message detail output
+      const whatsappText = `Hello Seenu Guest House! 👋
+
+I would like to instantly book a medical lodging stay. Here are my formatted booking details:
+
+🏨 STAY DETAILS:
+• Room Category: ${roomCategory}
+• Expected Check-In: ${checkInDate}
+• Expected Check-Out: ${checkOutDate}
+• Stay Duration: ${diffDays} Day${diffDays > 1 ? 's' : ''}
+• Estimated Room Price: ₹${calculatedAmt}${discountPercent > 0 ? ` (With ${discountPercent}% long-stay discount applied)` : ''}
+
+👤 GUEST DETAILS:
+• Attendant Name: ${guestName}
+• Active WhatsApp/Phone: ${guestPhone}
+• Email Address: ${guestEmail || 'Not Provided'}
+• Native Home State: ${guestState}
+• CMC Patient UHID Card No: ${patientCardNo || 'Not Provided'}
+
+🚗 TRANSIT & PICKUP SERVICE:
+• Required Pickup: ${needTravel ? '✅ Yes' : '❌ No'}
+• Pickup Terminal: ${needTravel && pickupPoint !== 'None' ? pickupPoint : 'N/A'}
+• Expected Arrival Time: ${needTravel ? pickupTime : 'N/A'}
+• National Train/Flight No: ${needTravel ? flightTrainNo : 'N/A'}
+
+📝 COMPANION & RECOVERY REQUESTS:
+• Instructions: ${specialInstructions || 'None'}
+
+Please confirm availability and dispatch booking receipt coordinates!`;
+
+      // Redirect to WhatsApp with encoded parameters to bypass database latency
+      const encodedText = encodeURIComponent(whatsappText);
+      const whatsappUrl = `https://wa.me/919360211223?text=${encodedText}`;
+      
+      // Attempt to immediately open WhatsApp tab
+      window.open(whatsappUrl, '_blank');
+
       setSubmitSuccess(true);
       setTimeout(() => {
         onSuccess();
         onClose();
-      }, 2000);
+      }, 4000);
     } catch (e: any) {
       setErrorMsg('Something went wrong. Please check your date formats.');
     } finally {
@@ -190,7 +228,7 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
                 : 'border-transparent text-slate-500 hover:text-slate-905 bg-slate-50/50'
             }`}
           >
-            ⚡ Instant Request (Test Admin Dashboard!)
+            ⚡ Direct Booking via WhatsApp
           </button>
           <button
             onClick={() => setFormType('google-form')}
@@ -200,7 +238,7 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
                 : 'border-transparent text-slate-500 hover:text-slate-905 bg-slate-50/50'
             }`}
           >
-            📋 Live Google Form Connection
+            📋 Alternative Google Form
           </button>
         </div>
 
@@ -209,12 +247,15 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
           {submitSuccess ? (
             <div className="py-12 px-4 text-center flex flex-col items-center justify-center">
               <div className="w-16 h-16 bg-emerald-50 text-emerald-600 border-2 border-emerald-200 flex items-center justify-center rounded-full mb-4 animate-scale-up">
-                <CheckCircle2 className="w-10 h-10" />
+                <CheckCircle2 className="w-10 h-10 animate-bounce" />
               </div>
-              <h2 className="text-2xl font-bold text-slate-900">Request Lodged Successfully!</h2>
-              <p className="text-slate-600 text-sm mt-2 max-w-md">
-                Your guesthouse booking and travel assistance request has been recorded. Since this is in live test mode, you can immediately manage this check-in in our **Admin Dashboard**!
+              <h2 className="text-2xl font-bold text-slate-900">Redirecting to WhatsApp...</h2>
+              <p className="text-slate-600 text-sm mt-3 max-w-md">
+                We have prepared your custom lodging details! We are now launching WhatsApp to connect you directly with our Coordinator for instant receipt confirmation.
               </p>
+              <div className="mt-4 text-xs font-mono bg-slate-50 border border-slate-100 p-3 rounded-xl text-slate-500 max-w-md">
+                This process bypasses database latency to maximize support response times. Note: booking is also visible in your local office manager dashboard!
+              </div>
             </div>
           ) : formType === 'google-form' ? (
             <div className="py-2 space-y-6">
@@ -543,9 +584,9 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl transition duration-200 shadow-sm text-sm cursor-pointer flex items-center justify-center gap-1.5"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition duration-200 shadow-sm text-sm cursor-pointer flex items-center justify-center gap-1.5"
                 >
-                  {isSubmitting ? 'Registering Booking...' : 'Submit Stay Request'}
+                  {isSubmitting ? 'Formatting Details...' : 'Book Now & Open on WhatsApp ⚡'}
                 </button>
               </div>
             </form>
