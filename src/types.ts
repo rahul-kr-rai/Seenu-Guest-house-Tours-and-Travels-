@@ -6,7 +6,7 @@
 export interface GuestRoom {
   id: string;
   roomNumber: string;
-  category: 'Standard AC' | 'Standard Non-AC' | 'Deluxe Family AC' | 'Deluxe Double AC';
+  category: 'Non-AC Single Room' | 'Non-AC Double Room' | 'Non-AC Double Room with Balcony' | 'AC Single Room' | 'AC Double Room';
   pricePerDay: number;
   capacity: number;
   beds: string;

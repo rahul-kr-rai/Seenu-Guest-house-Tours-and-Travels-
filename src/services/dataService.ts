@@ -7,11 +7,11 @@ import { GuestRoom, Booking, TravelService, ContactInquiry, Testimonial } from '
 
 // Robust local storage keys
 const KEYS = {
-  ROOMS: 'CMC_GUESTHOUSE_ROOMS',
-  BOOKINGS: 'CMC_GUESTHOUSE_BOOKINGS',
-  TRAVEL: 'CMC_GUESTHOUSE_TRAVEL',
-  INQUIRIES: 'CMC_GUESTHOUSE_INQUIRIES',
-  TESTIMONIALS: 'CMC_GUESTHOUSE_TESTIMONIALS'
+  ROOMS: 'SEENU_ROOMS_V2',
+  BOOKINGS: 'SEENU_BOOKINGS_V2',
+  TRAVEL: 'SEENU_TRAVEL_V2',
+  INQUIRIES: 'SEENU_INQUIRIES_V2',
+  TESTIMONIALS: 'SEENU_TESTIMONIALS_V2'
 };
 
 // Seed Rooms
@@ -19,74 +19,74 @@ const DEFAULT_ROOMS: GuestRoom[] = [
   {
     id: 'room-101',
     roomNumber: '101',
-    category: 'Standard AC',
-    pricePerDay: 1200,
-    capacity: 2,
-    beds: '1 Double Bed',
-    amenities: ['Air Conditioning', 'Free High-speed Wi-Fi', 'Attached Bathroom', 'Smart TV', 'Geyser', 'Wheelchair Friendly'],
+    category: 'Non-AC Single Room',
+    pricePerDay: 300,
+    capacity: 1,
+    beds: '1 Single Bed',
+    amenities: ['Single Attached Washroom', 'Free Pot', 'Common Refrigerator for cooking/water', 'Common Kitchen Access', 'Tap Water (Free)', 'Self-Cleaning Setup'],
     status: 'Available',
-    description: 'Clean, airy, and cozy room located on the ground floor making it highly suitable for patients needing minimal movement. High speed wifi included.',
-    imgUrl: 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=600&q=80'
+    description: 'Fully furnished, cost-effective single room. Ideal for recovering patients or single attendants wanting homelike kitchen features with free pots.',
+    imgUrl: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=600&q=80'
   },
   {
     id: 'room-102',
     roomNumber: '102',
-    category: 'Standard Non-AC',
-    pricePerDay: 750,
+    category: 'Non-AC Double Room',
+    pricePerDay: 600,
     capacity: 2,
-    beds: '2 Single Beds',
-    amenities: ['Ceiling Fan', 'Free High-speed Wi-Fi', 'Attached Bathroom', 'Elevator Access', 'Geyser'],
+    beds: '1 Double Bed',
+    amenities: ['Double Attached Washroom', 'Free Pot', 'Common Refrigerator for cooking/water', 'Common Kitchen Access', 'Tap Water (Free)', 'Self-Cleaning Setup'],
     status: 'Available',
-    description: 'An economical clean option for patient attendants. Located on the first floor with beautiful ventilation, single beds, and high ceiling fan controls.',
-    imgUrl: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=600&q=80'
+    description: 'Ventilated double room with attached washroom. Self-kitchen friendliness and full assistance for patient families.',
+    imgUrl: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=600&q=80'
+  },
+  {
+    id: 'room-103',
+    roomNumber: '103',
+    category: 'Non-AC Double Room with Balcony',
+    pricePerDay: 800,
+    capacity: 2,
+    beds: '1 Double Bed',
+    amenities: ['Double Attached Washroom', 'Private Breezy Balcony', 'Free Pot', 'Common Refrigerator', 'Common Kitchen Access', 'Tap Water (Free)'],
+    status: 'Available',
+    description: 'Breezy double room featuring a spacious private balcony. Located near Ida Scudder Road with wonderful road ventilation.',
+    imgUrl: 'https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&w=600&q=80'
   },
   {
     id: 'room-201',
     roomNumber: '201',
-    category: 'Deluxe Double AC',
-    pricePerDay: 1600,
-    capacity: 3,
-    beds: '1 Double Bed + 1 Single Bed',
-    amenities: ['Superfast Wi-Fi', 'Premium Air Conditioning', 'En-suite Bathroom', 'Balcony', 'RO Water Dispenser', 'Mini Refrigerator'],
+    category: 'AC Single Room',
+    pricePerDay: 700,
+    capacity: 1,
+    beds: '1 Single Bed',
+    amenities: ['Air Conditioning', 'Attached Washroom', 'Common Refrigerator', 'Common Kitchen Access', 'Tap Water (Free)', 'Free Pot'],
     status: 'Occupied',
-    description: 'Spacious first-floor room featuring a private balcony and a small refrigerator to store cooling medicines or health food. Outstanding hygiene ventilation.',
-    imgUrl: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=600&q=80'
+    description: 'Highly hygienic single AC room with attached washroom. Recommended for high-comfort patient healing.',
+    imgUrl: 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=600&q=80'
   },
   {
     id: 'room-202',
     roomNumber: '202',
-    category: 'Deluxe Family AC',
-    pricePerDay: 2200,
-    capacity: 4,
-    beds: '2 King Beds',
-    amenities: ['Premium Air Conditioning', 'Induction Cooktop & Small Kitchenette', 'Attached Large Bathroom', 'Water Purifier', 'Elevator Access', 'Smart TV with Multi-lingual packs'],
-    status: 'Cleaning',
-    description: 'Designed specifically for extended medical-attendant families. Comes with an attached induction kitchenette so you can cook prescribed therapeutic meals in absolute hygiene.',
-    imgUrl: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'room-301',
-    roomNumber: '301',
-    category: 'Standard AC',
+    category: 'AC Double Room',
     pricePerDay: 1200,
     capacity: 2,
     beds: '1 Double Bed',
-    amenities: ['Air Conditioning', 'Free High-speed Wi-Fi', 'Attached Bathroom', 'Smart TV', 'Geyser', 'Quiet Recovery Zone'],
-    status: 'Available',
-    description: 'Quiet third-floor sanctuary crafted for post-surgery recovery. Excellent sound insulation, double blackout curtains, and high-pressure hot water.',
-    imgUrl: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=600&q=80'
+    amenities: ['Air Conditioning', 'Double Attached Washroom', 'Common Refrigerator', 'Common Kitchen Access', 'Tap Water (Free)', 'Free Pot'],
+    status: 'Cleaning',
+    description: 'Fully furnished, high-comfort double AC room with attached washroom. Spotless cleanliness with daily self-dustbins.',
+    imgUrl: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=600&q=80'
   },
   {
-    id: 'room-302',
-    roomNumber: '302',
-    category: 'Standard Non-AC',
-    pricePerDay: 750,
+    id: 'room-203',
+    roomNumber: '203',
+    category: 'AC Double Room',
+    pricePerDay: 1200,
     capacity: 2,
-    beds: '1 Double Bed',
-    amenities: ['Ceiling Fan', 'Attached Bathroom', 'Free High-speed Wi-Fi', 'Elevator Access', 'RO Drinking Water'],
-    status: 'Maintenance',
-    description: 'Budget-friendly second-floor room undergoing periodic sanitization and deep cleaning to maintain zero infection standards for incoming patients.',
-    imgUrl: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=600&q=80'
+    beds: '2 Single Beds',
+    amenities: ['Air Conditioning', 'Double Attached Washroom', 'Common Refrigerator', 'Common Kitchen Access', 'Tap Water (Free)', 'Free Pot'],
+    status: 'Available',
+    description: 'Premium double AC room with twin single beds, adjacent to the shared self-kitchen area.',
+    imgUrl: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=600&q=80'
   }
 ];
 
@@ -99,19 +99,19 @@ const DEFAULT_BOOKINGS: Booking[] = [
     guestEmail: 'animesh.m@gmail.com',
     guestState: 'West Bengal',
     patientCardNo: 'CMC-789210-B',
-    roomCategory: 'Deluxe Family AC',
+    roomCategory: 'AC Double Room',
     assignedRoomId: 'room-202',
     checkInDate: '2026-06-12',
-    checkOutDate: '2026-06-25',
+    checkOutDate: '2026-06-27', // 15 days
     status: 'CheckedIn',
-    totalAmount: 28600,
+    totalAmount: 16200, // 1200 * 15 = 18000, 10% discount = 16200
     needTravelAssistance: true,
     travelDetails: {
       pickupPoint: 'Chennai Airport',
       pickupTime: '2026-06-12 14:00',
       flightOrTrainNo: '6E-2435 Indigo'
     },
-    specialInstructions: 'Patient needs a wheelchair at arrival. Booking kitchenette suite for cooking clean Bengali meals.',
+    specialInstructions: 'Patient needs a wheelchair at arrival. Self-kitchen setup used daily for cooking light Bengali meals.',
     createdAt: '2026-06-10T11:30:00Z'
   },
   {
@@ -121,19 +121,19 @@ const DEFAULT_BOOKINGS: Booking[] = [
     guestEmail: 'kameshnair@gmail.com',
     guestState: 'Kerala',
     patientCardNo: 'CMC-103452-Y',
-    roomCategory: 'Deluxe Double AC',
-    assignedRoomId: 'room-201',
+    roomCategory: 'Non-AC Double Room with Balcony',
+    assignedRoomId: 'room-103',
     checkInDate: '2026-06-14',
     checkOutDate: '2026-06-18',
     status: 'Confirmed',
-    totalAmount: 6400,
+    totalAmount: 3200, // 800 * 4 = 3200
     needTravelAssistance: true,
     travelDetails: {
       pickupPoint: 'Katpadi Railway Station',
       pickupTime: '2026-06-14 06:15',
       flightOrTrainNo: '12626 Kerala Express'
     },
-    specialInstructions: 'Please arrange local auto shuttle back and forth to CMC Gate 1 on treatment days.',
+    specialInstructions: 'Please arrange local auto transportation back and forth on treatment days.',
     createdAt: '2026-06-12T15:24:00Z'
   },
   {
@@ -141,9 +141,9 @@ const DEFAULT_BOOKINGS: Booking[] = [
     guestName: 'Dr. Sanjay Agarwal',
     guestPhone: '+91 99100 88221',
     guestState: 'Uttar Pradesh',
-    roomCategory: 'Standard AC',
+    roomCategory: 'AC Single Room',
     status: 'Pending',
-    totalAmount: 3600,
+    totalAmount: 2100, // 700 * 3 = 2100
     needTravelAssistance: false,
     specialInstructions: 'Visiting CMC for clinical consultation. Request clean high floor room.',
     createdAt: '2026-06-13T18:45:00Z',
@@ -157,19 +157,19 @@ const DEFAULT_BOOKINGS: Booking[] = [
     guestEmail: 'rahim.ahsan@yahoo.com',
     guestState: 'Dhaka, Bangladesh',
     patientCardNo: 'CMC-410398-X',
-    roomCategory: 'Standard AC',
-    assignedRoomId: 'room-301',
+    roomCategory: 'AC Single Room',
+    assignedRoomId: 'room-201',
     checkInDate: '2026-06-05',
     checkOutDate: '2026-06-13',
     status: 'Completed',
-    totalAmount: 9600,
+    totalAmount: 5600, // 700 * 8 = 5600
     needTravelAssistance: true,
     travelDetails: {
       pickupPoint: 'Chennai Airport',
       pickupTime: '2026-06-05 10:10',
       flightOrTrainNo: 'BG-0083 Biman Bangladesh'
     },
-    specialInstructions: 'Needs assistance with currency exchange and Sim card set-up upon Arrival.',
+    specialInstructions: 'Needs currency exchange support and active assistance with local SIM card activation.',
     createdAt: '2026-06-01T09:20:00Z'
   }
 ];
@@ -178,50 +178,50 @@ const DEFAULT_BOOKINGS: Booking[] = [
 const DEFAULT_TRAVEL: TravelService[] = [
   {
     id: 'travel-1',
-    serviceName: 'Katpadi Station Shuttle',
-    vehicleType: 'Auto Rickshaw / Hatchback',
-    ratePerKm: 15,
-    fixedRate: 150,
-    coverage: 'Local Vellore',
-    description: 'Quick reliable transport from Katpadi Junction Railway Station straight to our guesthouse doorstep. Attendants will assist with luggage carrying.',
+    serviceName: 'Airport/Railway Pickup & Drop',
+    vehicleType: 'Auto, Car, Bus, Train, Airplane',
+    ratePerKm: 0,
+    fixedRate: 0,
+    coverage: 'Airport Pickup',
+    description: 'Seamless pick-and-drop support from Chennai Airport, Bangalore Airport, or Katpadi junction. Charge varies depending on distance, time, and transport type selected.',
     isAvailable: true,
     driverName: 'Suresh Kumar',
     driverContact: '+91 95000 88771'
   },
   {
     id: 'travel-2',
-    serviceName: 'Chennai Airport Express',
-    vehicleType: 'Sedan (Toyota Etios/Swift DZire)',
-    ratePerKm: 13,
-    fixedRate: 3200,
-    coverage: 'Airport Pickup',
-    description: 'Hassle-free AC sedan pickup from Chennai International Airport directly to Scudder road, Vellore. Driver handles flight monitoring to ensure instant pickup on landing.',
+    serviceName: 'Tourist Place Travel with Selected Location',
+    vehicleType: 'Car, SUV, Auto, Bus',
+    ratePerKm: 0,
+    fixedRate: 0,
+    coverage: 'Intercity Outstation',
+    description: 'Sightseeing, historical tours, or personal trips tailored around nearby landmarks. Charge depends on duration and distance covered.',
     isAvailable: true,
     driverName: 'Murugan G.',
     driverContact: '+91 94441 55662'
   },
   {
     id: 'travel-3',
-    serviceName: 'Bengaluru Airport Super-Comfort',
-    vehicleType: 'SUV (Toyota Innova Crysta)',
-    ratePerKm: 18,
-    fixedRate: 5200,
-    coverage: 'Airport Pickup',
-    description: 'Premium absolute comfort, orthopedic seats, ideal for patients who have undergone critical procedures. Spacious enough for wheelchairs and large bags.',
+    serviceName: 'Bus Ticket Booking',
+    vehicleType: 'Sleeper, Semi-Sleeper, AC Bus',
+    ratePerKm: 0,
+    fixedRate: 0,
+    coverage: 'Local Vellore',
+    description: 'Instant platform assistance for booking long-distance express buses toward Bangalore, Chennai, Kochi, Hyderabad, or Vijayawada.',
     isAvailable: true,
-    driverName: 'Anand Dev',
-    driverContact: '+91 88992 01020'
+    driverName: 'Desk Coordinator',
+    driverContact: '+91 93602 11223'
   },
   {
     id: 'travel-4',
-    serviceName: 'Daily Hospital Shuttle',
-    vehicleType: 'Eco-E-Rickshaw (Wheelchair Fit)',
+    serviceName: 'Tirupati Balaji Ji Darshan Tour',
+    vehicleType: 'Car, SUV, Bus',
     ratePerKm: 0,
-    fixedRate: 50,
-    coverage: 'Local Vellore',
-    description: 'Constant back-and-forth transit care to CMC Hospital Main Building, OPD, or Mental Health Dept. Cleanly fitted with safe ramps.',
+    fixedRate: 0,
+    coverage: 'Intercity Outstation',
+    description: 'Special dynamic travel packages for Tirupati Balaji Ji Darshan. Rates depend on group size, vehicle choice, and peak schedule dates.',
     isAvailable: true,
-    driverName: 'Selvam',
+    driverName: 'Seenu Travels',
     driverContact: '+91 93602 11223'
   }
 ];

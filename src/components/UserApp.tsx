@@ -24,7 +24,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
   const [travels, setTravels] = useState<TravelService[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
-  const [selectedRoomCat, setSelectedRoomCat] = useState('Standard AC');
+  const [selectedRoomCat, setSelectedRoomCat] = useState('Non-AC Single Room');
 
   // Contact form state
   const [senderName, setSenderName] = useState('');
@@ -117,7 +117,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button
-              onClick={() => handleBookingStart('Standard AC')}
+              onClick={() => handleBookingStart('Non-AC Single Room')}
               className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 sm:px-5 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition shadow-xs cursor-pointer flex items-center gap-1 shrink-0"
             >
               Book Stay
@@ -170,7 +170,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <button
-                onClick={() => handleBookingStart('Standard AC')}
+                onClick={() => handleBookingStart('Non-AC Single Room')}
                 className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-8 py-3.5 rounded-xl text-center shadow-md transition duration-200 flex items-center justify-center gap-2 cursor-pointer"
               >
                 Book Accommodation & Transit
@@ -485,7 +485,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
                     <span className="text-xs text-gray-400 font-light">All tolls included</span>
                     
                     <button
-                      onClick={() => handleBookingStart('Standard AC')}
+                      onClick={() => handleBookingStart('Non-AC Single Room')}
                       className="mt-2 block w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-3 py-1.5 rounded-lg transition"
                     >
                       Book Driver
@@ -581,7 +581,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
                 Are there clean kitchens to cook meals?
               </h4>
               <p className="text-gray-600 font-light text-sm mt-2 leading-relaxed pl-7">
-                Yes. Our Deluxe Family AC rooms feature an attached private kitchenette with induction cookers. Additionally, we have a shared central induction kitchen on each floor containing clean cooking utensils, cutting knives, and individual container lockboxes. Rice cookers are also provided on request.
+                Yes. We offer robust facilities for self-cooking (highly requested for patients' recovery diets). Our common kitchen is equipped with a pot, a gas stove with a gas cylinder, and a shared refrigerator for water and cooking storage. We also provide 20L Filter Water Cans for ₹50, and Bisleri bottled water (5L for ₹75, 10L for ₹120).
               </p>
             </div>
 
@@ -611,7 +611,17 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
                 Do you coordinate wheelchair transport across cities?
               </h4>
               <p className="text-gray-600 font-light text-sm mt-2 leading-relaxed pl-7">
-                Yes, our customized SUV (Toyota Innova Crysta can fit foldable wheelchairs). Extra medical attendant guides can be requested to sit alongside the patient on intercity drives from Chennai Airport straight to Vellore.
+                Yes, our customized SUV (such as Toyota Innova Crysta/Car/Auto/Bus/Train/Airplane options depends on distance and time) can fit foldable wheelchairs. Extra medical attendant guides can be requested to sit alongside the patient on intercity drives from Chennai Airport straight to Vellore.
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+              <h4 className="font-bold text-slate-900 text-sm md:text-base flex items-center gap-2">
+                <HelpCircle className="w-5 h-5 text-blue-600 shrink-0" />
+                What is the daily cleaning policy?
+              </h4>
+              <p className="text-gray-600 font-light text-sm mt-2 leading-relaxed pl-7">
+                To respect absolute patient privacy and medical infection protocols, room cleaning is self-service only. Clean dustbins are provided in all rooms, and our staff clears them daily from the hallways.
               </p>
             </div>
           </div>

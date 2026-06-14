@@ -683,7 +683,7 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
                           </div>
 
                           <div className="border-t border-slate-900 pt-3">
-                            <p className="text-slate-500 uppercase font-mono text-[10px] mb-2">Simulate Manual Status Override</p>
+                            <p className="text-slate-500 uppercase font-mono text-[10px] mb-2">Manual Service Status Override</p>
                             <div className="grid grid-cols-4 gap-1.5 text-[10px] font-mono">
                               {(['Available', 'Occupied', 'Cleaning', 'Maintenance'] as const).map((st) => (
                                 <button

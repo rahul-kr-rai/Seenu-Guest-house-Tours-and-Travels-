@@ -13,7 +13,7 @@ interface BookingFormProps {
   selectedCategory?: string;
 }
 
-export default function BookingForm({ onClose, onSuccess, selectedCategory = 'Standard AC' }: BookingFormProps) {
+export default function BookingForm({ onClose, onSuccess, selectedCategory = 'Non-AC Single Room' }: BookingFormProps) {
   const [formType, setFormType] = useState<'instant' | 'google-form'>('instant');
   const [guestName, setGuestName] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
@@ -33,10 +33,11 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'St
   const [errorMsg, setErrorMsg] = useState('');
 
   const roomCategories = [
-    'Standard AC',
-    'Standard Non-AC',
-    'Deluxe Family AC',
-    'Deluxe Double AC'
+    'Non-AC Single Room',
+    'Non-AC Double Room',
+    'Non-AC Double Room with Balcony',
+    'AC Single Room',
+    'AC Double Room'
   ];
 
   const StatesList = [
@@ -68,13 +69,22 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'St
       // Find room price
       const rooms = dbService.getRooms();
       const matchedCat = rooms.find(r => r.category === roomCategory);
-      const price = matchedCat ? matchedCat.pricePerDay : 1000;
+      const price = matchedCat ? matchedCat.pricePerDay : 300;
 
-      // Calculate total amount
+      // Calculate total amount with discounts: 15+ days = 10% off, 30+ days = 20% off
       const t1 = new Date(checkInDate).getTime();
       const t2 = new Date(checkOutDate).getTime();
       const diffDays = Math.max(1, Math.round((t2 - t1) / (1000 * 60 * 60 * 24)));
-      const calculatedAmt = price * diffDays;
+      const baseCost = price * diffDays;
+      let discountPercent = 0;
+      if (diffDays >= 30) {
+        discountPercent = 20;
+      } else if (diffDays >= 15) {
+        discountPercent = 10;
+      }
+      
+      const savedAmount = Math.round((baseCost * discountPercent) / 100);
+      const calculatedAmt = baseCost - savedAmount;
 
       dbService.addBooking({
         guestName,
@@ -112,6 +122,43 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'St
     const googleFormBaseUrl = "https://forms.gle/pCrZeoYRmyJ7TAx48";
     window.open(googleFormBaseUrl, '_blank');
   };
+
+  const calculateLivePrice = () => {
+    if (!checkInDate || !checkOutDate) return null;
+    try {
+      const rooms = dbService.getRooms();
+      const matchedCat = rooms.find(r => r.category === roomCategory);
+      if (!matchedCat) return null;
+      const price = matchedCat.pricePerDay;
+
+      const t1 = new Date(checkInDate).getTime();
+      const t2 = new Date(checkOutDate).getTime();
+      const diffDays = Math.max(1, Math.round((t2 - t1) / (1000 * 60 * 60 * 24)));
+      const baseCost = price * diffDays;
+      let discountPercent = 0;
+      if (diffDays >= 30) {
+        discountPercent = 20;
+      } else if (diffDays >= 15) {
+        discountPercent = 10;
+      }
+
+      const savedAmount = Math.round((baseCost * discountPercent) / 100);
+      const finalCost = baseCost - savedAmount;
+
+      return {
+        diffDays,
+        price,
+        baseCost,
+        discountPercent,
+        savedAmount,
+        finalCost
+      };
+    } catch {
+      return null;
+    }
+  };
+
+  const priceCalc = calculateLivePrice();
 
   return (
     <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
@@ -358,9 +405,53 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'St
                     </div>
                   </div>
                 </div>
+
+                {/* Live Pricing Estimation Panel */}
+                {priceCalc && (
+                  <div className="mt-4 bg-emerald-50/70 border border-emerald-100 p-4 rounded-xl space-y-2 text-slate-800 animate-scale-up">
+                    <div className="flex justify-between items-center pb-2 border-b border-emerald-100/50">
+                      <span className="text-xs font-bold text-emerald-800 uppercase tracking-wide">
+                        Live Stay Price Estimate
+                      </span>
+                      <span className="text-xs font-mono font-bold text-emerald-700 bg-white px-2 py-0.5 rounded border border-emerald-100">
+                        {priceCalc.diffDays} {priceCalc.diffDays === 1 ? 'Day' : 'Days'}
+                      </span>
+                    </div>
+                    <div className="text-xs space-y-1 bg-white/40 p-2.5 rounded-lg">
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Daily Rate:</span>
+                        <span className="font-semibold text-slate-850">₹{priceCalc.price} / day</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Base total:</span>
+                        <span className="font-semibold text-slate-850">₹{priceCalc.baseCost}</span>
+                      </div>
+                      {priceCalc.discountPercent > 0 && (
+                        <div className="flex justify-between text-emerald-700 font-medium">
+                          <span>Discount Applied ({priceCalc.discountPercent}%):</span>
+                          <span>- ₹{priceCalc.savedAmount}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex justify-between items-center pt-2 font-sans font-bold text-[#111827]">
+                      <span className="text-emerald-950 text-xs uppercase tracking-wider font-mono">Estimated Sum:</span>
+                      <span className="text-lg text-emerald-600">₹{priceCalc.finalCost}</span>
+                    </div>
+                    {priceCalc.discountPercent > 0 ? (
+                      <p className="text-[10px] text-emerald-700 text-right font-medium italic">
+                        ✓ Long stay discount applied successfully! Saving ₹{priceCalc.savedAmount}
+                      </p>
+                    ) : (
+                      <p className="text-[10px] text-slate-400 text-right leading-none">
+                        💡 Save 10% after 15 days or 20% after 30 days of medical lodging!
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Travel Services */}
+
               <div className="pt-2 border-t border-slate-100">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-mono uppercase tracking-widest text-blue-600 font-bold text-slate-500">
