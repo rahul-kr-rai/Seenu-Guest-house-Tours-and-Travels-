@@ -1,0 +1,6 @@
+{
+  "name": "Seenu Guest House, Tour's and Travels.",
+  "description": "Premium guest room accommodation and medical transit assistance services by Seenu Guest House, located walking distance from CMC Hospital, Vellore, Tamil Nadu.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
