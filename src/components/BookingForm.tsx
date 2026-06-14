@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { dbService } from '../services/dataService';
-import { Calendar, User, Phone, MapPin, ClipboardList, Plane, CheckCircle2, AlertCircle, Sparkles, HelpCircle } from 'lucide-react';
+import { Calendar, User, Phone, MapPin, ClipboardList, Plane, CheckCircle2, AlertCircle, Sparkles, HelpCircle, Copy, ExternalLink } from 'lucide-react';
 
 interface BookingFormProps {
   onClose: () => void;
@@ -31,6 +31,9 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [generatedTicket, setGeneratedTicket] = useState('');
+  const [whatsappUrl, setWhatsappUrl] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const roomCategories = [
     'Non-AC Single Room',
@@ -107,48 +110,79 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
         specialInstructions
       });
 
-      // Construct visually rich pre-filled WhatsApp message detail output
-      const whatsappText = `Hello Seenu Guest House! 👋
+      // Construct the formatted ticket
+      const pickupTxt = needTravel ? 'Yes' : 'No';
+      const cleanTerminal = needTravel && pickupPoint ? (pickupPoint.includes('(') ? pickupPoint.split('(')[0].trim() : pickupPoint) : 'N/A';
+      const terminalTxt = cleanTerminal.substring(0, 14);
+      const timeTxt = needTravel && pickupTime ? pickupTime.substring(0, 12) : 'N/A';
+      const longStayDiscountTxt = discountPercent > 0 ? `${discountPercent}%` : '0%';
 
-I would like to instantly book a medical lodging stay. Here are my formatted booking details:
+      const whatsappText = `\`\`\`============================
+🎟️ SEENU GUEST HOUSE TICKET 🎟️
+============================
+ CONFIRMED MEDICAL LODGING  
+============================
 
-🏨 STAY DETAILS:
-• Room Category: ${roomCategory}
-• Expected Check-In: ${checkInDate}
-• Expected Check-Out: ${checkOutDate}
-• Stay Duration: ${diffDays} Day${diffDays > 1 ? 's' : ''}
-• Estimated Room Price: ₹${calculatedAmt}${discountPercent > 0 ? ` (With ${discountPercent}% long-stay discount applied)` : ''}
+🏨 STAY OVERVIEW
+────────────────────────────
+  ▶ GUEST:  ${guestName.substring(0, 14)}
+  ▶ ROOM:   ${roomCategory.replace(' Room', '').substring(0, 14)}
+  ▶ DAYS:   ${diffDays} Day${diffDays > 1 ? 's' : ''}
+  ▶ IN:     ${checkInDate}
+  ▶ OUT:    ${checkOutDate}
+────────────────────────────
 
-👤 GUEST DETAILS:
-• Attendant Name: ${guestName}
-• Active WhatsApp/Phone: ${guestPhone}
-• Email Address: ${guestEmail || 'Not Provided'}
-• Native Home State: ${guestState}
-• CMC Patient UHID Card No: ${patientCardNo || 'Not Provided'}
+🚗 ARRIVAL LOGISTICS
+────────────────────────────
+  ▶ CAB:    ${pickupTxt}
+  ▶ TERM:   ${terminalTxt}
+  ▶ TIME:   ${timeTxt}
+  ▶ DRIVER: Assigned
+────────────────────────────
 
-🚗 TRANSIT & PICKUP SERVICE:
-• Required Pickup: ${needTravel ? '✅ Yes' : '❌ No'}
-• Pickup Terminal: ${needTravel && pickupPoint !== 'None' ? pickupPoint : 'N/A'}
-• Expected Arrival Time: ${needTravel ? pickupTime : 'N/A'}
-• National Train/Flight No: ${needTravel ? flightTrainNo : 'N/A'}
+💰 FARE BREAKDOWN
+────────────────────────────
+  • RATE:   ₹${price}/Day
+  • LESS:   ${longStayDiscountTxt}
+  ➔ TOTAL:  ₹${calculatedAmt}
+  ➔ STATUS: [ PENDING ]
+────────────────────────────
 
-📝 COMPANION & RECOVERY REQUESTS:
-• Instructions: ${specialInstructions || 'None'}
+🍳 FREE UTILITIES
+────────────────────────────
+  ✔ Attached Private Bath
+  ✔ Self-cook Kitchen
+  ✔ Gas Stove & Utensils
+  ✔ Pure RO Drink Water
+────────────────────────────
 
-Please confirm availability and dispatch booking receipt coordinates!`;
+⚠️ VITAL STAY POLICIES
+────────────────────────────
+  1. Self-service clean
+  2. Paid options:
+     • Can 20L: ₹50
+     • Bisleri: ₹75-120
+────────────────────────────
+
+👉 REQUIRED FOR ENTRY:
+Reply with photo of ID Proof
+and Patient UHID Card.
+============================\`\`\``;
 
       // Redirect to WhatsApp with encoded parameters to bypass database latency
       const encodedText = encodeURIComponent(whatsappText);
-      const whatsappUrl = `https://wa.me/919360211223?text=${encodedText}`;
+      const computedUrl = `https://wa.me/919360211223?text=${encodedText}`;
       
-      // Attempt to immediately open WhatsApp tab
-      window.open(whatsappUrl, '_blank');
-
+      setGeneratedTicket(whatsappText);
+      setWhatsappUrl(computedUrl);
       setSubmitSuccess(true);
-      setTimeout(() => {
-        onSuccess();
-        onClose();
-      }, 4000);
+
+      // Attempt to immediately open WhatsApp tab (might be blocked by popup blocker, which is fine since we display the view!)
+      try {
+        window.open(computedUrl, '_blank');
+      } catch (err) {
+        console.error('Failed to auto-open WhatsApp due to popup blocker', err);
+      }
     } catch (e: any) {
       setErrorMsg('Something went wrong. Please check your date formats.');
     } finally {
@@ -245,17 +279,59 @@ Please confirm availability and dispatch booking receipt coordinates!`;
         {/* Scrollable form body */}
         <div className="p-6 overflow-y-auto">
           {submitSuccess ? (
-            <div className="py-12 px-4 text-center flex flex-col items-center justify-center">
-              <div className="w-16 h-16 bg-emerald-50 text-emerald-600 border-2 border-emerald-200 flex items-center justify-center rounded-full mb-4 animate-scale-up">
-                <CheckCircle2 className="w-10 h-10 animate-bounce" />
+            <div className="py-2 px-2 text-center flex flex-col items-center">
+              <div className="w-12 h-12 bg-emerald-50 text-emerald-600 border-2 border-emerald-200 flex items-center justify-center rounded-full mb-3 animate-scale-up">
+                <CheckCircle2 className="w-7 h-7" />
               </div>
-              <h2 className="text-2xl font-bold text-slate-900">Redirecting to WhatsApp...</h2>
-              <p className="text-slate-600 text-sm mt-3 max-w-md">
-                We have prepared your custom lodging details! We are now launching WhatsApp to connect you directly with our Coordinator for instant receipt confirmation.
+              <h2 className="text-xl font-bold text-slate-900">Digital Ticket Voucher Ready!</h2>
+              <p className="text-slate-500 text-xs mt-1 max-w-md">
+                Your reservation details are compiled successfully. Copy your ticket below or open directly in WhatsApp to secure your booking instantly with Seenu Guest House.
               </p>
-              <div className="mt-4 text-xs font-mono bg-slate-50 border border-slate-100 p-3 rounded-xl text-slate-500 max-w-md">
-                This process bypasses database latency to maximize support response times. Note: booking is also visible in your local office manager dashboard!
+
+              {/* High-fidelity visual mockup of the ticket voucher itself */}
+              <div className="w-full mt-4 text-left bg-slate-950 text-[#10b981] p-4 rounded-xl font-mono text-[11px] sm:text-xs overflow-x-auto whitespace-pre border border-slate-800 shadow-inner max-h-[280px]">
+                {generatedTicket.replace(/```/g, '').trim()}
               </div>
+
+              {/* Double-action CTAs for robust performance */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full mt-4">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(generatedTicket);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className={`py-3 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border cursor-pointer ${
+                    copied 
+                      ? 'bg-emerald-50 border-emerald-300 text-emerald-700 font-extrabold' 
+                      : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'
+                  }`}
+                >
+                  <Copy className="w-4 h-4" />
+                  {copied ? '✓ Copied Ticket Text!' : 'Copy Ticket Code'}
+                </button>
+
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[#25D366] hover:bg-[#20ba56] text-white py-3 px-4 rounded-xl text-xs font-black shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>Open WhatsApp</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
+
+              {/* Master close callback to dismiss modal */}
+              <button
+                onClick={() => {
+                  onSuccess();
+                  onClose();
+                }}
+                className="w-full mt-3 border border-slate-200 hover:bg-slate-50 text-slate-500 font-semibold py-2 rounded-xl transition text-xs cursor-pointer"
+              >
+                Finished & Close Window
+              </button>
             </div>
           ) : formType === 'google-form' ? (
             <div className="py-2 space-y-6">
