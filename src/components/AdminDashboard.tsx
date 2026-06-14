@@ -345,11 +345,15 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
             {/* Hamburger Toggle button always visible */}
             <button
               onClick={() => setIsAdminNavigationOpen(!isAdminNavigationOpen)}
-              className="p-2 rounded-xl text-slate-650 hover:text-blue-600 hover:bg-slate-100 transition focus:outline-none cursor-pointer"
+              className="p-2 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-slate-100 transition focus:outline-none cursor-pointer"
               title="Toggle Menu"
               id="admin-nav-toggle"
             >
-              {isAdminNavigationOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
+              {isAdminNavigationOpen ? (
+                <X className="w-[26px] h-[26px] sm:w-[32px] sm:h-[32px]" />
+              ) : (
+                <Menu className="w-[26px] h-[26px] sm:w-[32px] sm:h-[32px]" />
+              )}
             </button>
           </div>
         </div>

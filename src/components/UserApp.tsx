@@ -79,19 +79,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
   };
 
   return (
-    <div className="bg-slate-50 text-slate-800 min-h-screen">
-      {/* Top hospital announcement helper ban */}
-      <div className="bg-[#1e293b ] bg-slate-900 text-white/95 px-4 py-3 text-center text-xs md:text-sm font-medium tracking-tight flex items-center justify-center gap-2">
-        <HeartPulse className="w-4 h-4 text-blue-400 animate-pulse" />
-        <span>Providing premium recovery care and clean stays next to Christian Medical College (CMC), Vellore - Walking distance to Gate 1.</span>
-        <button 
-          onClick={onOpenAdmin} 
-          className="underline font-mono ml-4 text-blue-400 hover:text-blue-300 hidden sm:inline-block font-semibold"
-        >
-          Go to Manager Portal &rarr;
-        </button>
-      </div>
-
+    <div className="bg-slate-50 text-slate-800 min-h-screen font-sans">
       {/* Nav */}
       <header className="sticky top-0 bg-white/95 backdrop-blur-md shadow-xs border-b border-slate-200 z-40 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between gap-4">
@@ -143,14 +131,14 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
             {/* Hamburger Toggle for Mobile/Tablet */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-blue-600 hover:bg-slate-100 transition-colors focus:outline-none"
+              className="lg:hidden p-2 rounded-xl text-slate-650 hover:text-blue-600 hover:bg-slate-100 transition-colors focus:outline-none cursor-pointer"
               id="hamburger-menu-toggle"
               aria-label="Toggle Navigation Menu"
             >
               {isMobileMenuOpen ? (
-                <X className="w-5 h-5 sm:w-6 sm:h-6" />
+                <X className="w-[26px] h-[26px] sm:w-[32px] sm:h-[32px]" />
               ) : (
-                <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
+                <Menu className="w-[26px] h-[26px] sm:w-[32px] sm:h-[32px]" />
               )}
             </button>
           </div>
