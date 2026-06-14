@@ -95,15 +95,23 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
       <header className="sticky top-0 bg-white/95 backdrop-blur-md shadow-xs border-b border-slate-200 z-40 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-            <div className="bg-blue-600 text-white p-2 sm:p-2.5 rounded-xl shadow-xs shrink-0">
-              <Building2 className="w-5 h-5 sm:w-6 sm:h-6" />
+            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-2 rounded-xl shadow-md shrink-0 flex items-center justify-center border border-white/10" id="seenu-brand-logo">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {/* Abstract hospitality + tour logo: A stylish roof with dual interlacing paths (for tours & travels) */}
+                <path d="M3 10L12 3L21 10" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M5 12V20C5 21.1046 5.89543 22 7 22H11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M19 12V20C19 21.1046 18.1046 22 17 22H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                {/* Emerald active travel curve representing safe health journeys */}
+                <path d="M9 13C9 13 11 11.5 12 11.5C13 11.5 15 13 15 13C15 13 13.5 16 12 16C10.5 16 9 13 9 13Z" fill="#10B981" />
+                <circle cx="12" cy="11.5" r="1.5" fill="white" />
+              </svg>
             </div>
             <div className="min-w-0">
               <h1 className="text-sm sm:text-base md:text-lg font-bold font-sans tracking-tight text-slate-900 flex items-center gap-1.5 flex-wrap">
                 <span className="truncate">Seenu Guest House</span> 
                 <span className="text-[9px] sm:text-[10px] bg-blue-50 text-blue-700 border border-blue-150 py-0.5 px-1.5 rounded-full font-mono uppercase font-semibold shrink-0">Tours & Travels</span>
               </h1>
-              <p className="text-[10px] sm:text-xs text-slate-500 font-light font-sans truncate">Premium CMC Area Lodging near Ida Scudder Road</p>
+              <p className="text-[10px] sm:text-xs text-slate-500 font-light font-sans truncate">Tours and Travels</p>
             </div>
           </div>
 
@@ -121,7 +129,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
               onClick={() => handleBookingStart('Non-AC Single Room')}
               className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 sm:px-5 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition shadow-xs cursor-pointer flex items-center gap-1 shrink-0"
             >
-              Book Stay
+              Book Now
             </button>
             <button
               onClick={onOpenAdmin}
