@@ -10,7 +10,7 @@ import {
   BarChart3, CalendarDays, KeyRound, Truck, 
   Mail, Settings, CheckCircle2, AlertCircle, Trash2, 
   User, RefreshCw, IndianRupee, ShieldCheck, MapPin, 
-  Maximize2, Plus, Edit2, Check, X, ShieldAlert, Menu, Upload
+  Maximize2, Plus, Edit2, Check, X, ShieldAlert, Menu, Upload, LogOut
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -308,7 +308,7 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
       
       {/* Navigation matching landing page */}
       <header className="sticky top-0 bg-white/95 backdrop-blur-md shadow-xs border-b border-slate-200 z-40 transition-all shrink-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
             <div className="bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-2.5 rounded-xl shadow-md shrink-0 flex items-center justify-center border border-white/10" id="seenu-brand-logo">
               <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -326,48 +326,129 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
                 Seenu Guest House
               </h1>
               <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                <span className="text-[9px] sm:text-[10px] bg-blue-50 text-blue-700 border border-blue-100 py-0.5 px-2 rounded-full font-mono font-semibold uppercase tracking-wider shrink-0">
+                <span className="text-[9px] sm:text-[10px] bg-blue-50 text-blue-700 border border-blue-150 py-0.5 px-2.5 rounded-full font-mono uppercase font-semibold shrink-0">
                   Tours & Travels
-                </span>
-                <span className="text-[9px] sm:text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-100 py-0.5 px-2 rounded-full font-mono font-semibold uppercase tracking-wider shrink-0">
-                  Operations Portal
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={loadAllData}
-              className="bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 p-2 sm:p-2.5 rounded-xl transition cursor-pointer"
-              title="Refresh Operations Data"
-            >
-              <RefreshCw className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-            </button>
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button
               onClick={onBackToWebsite}
-              className="bg-blue-600 hover:bg-blue-705 text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border border-transparent px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-sm hover:shadow-md transition duration-200 cursor-pointer flex items-center gap-1.5"
+              className="bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-700 border border-slate-200 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-[10px] sm:text-xs font-semibold tracking-tight transition cursor-pointer hidden sm:flex items-center gap-1.5 shrink-0"
             >
-              &larr; <span className="hidden sm:inline">Exit to</span> Website
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Exit Portal</span>
             </button>
-            {/* Hamburger Toggle button for small screens */}
+
+            {/* Hamburger Toggle button always visible */}
             <button
               onClick={() => setIsAdminNavigationOpen(!isAdminNavigationOpen)}
-              className="lg:hidden bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 p-2 rounded-xl transition cursor-pointer"
+              className="p-2 rounded-xl text-slate-650 hover:text-blue-600 hover:bg-slate-100 transition focus:outline-none cursor-pointer"
               title="Toggle Menu"
               id="admin-nav-toggle"
             >
-              {isAdminNavigationOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              {isAdminNavigationOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
             </button>
           </div>
         </div>
+
+        {/* Dropdown Menu matching landing page style */}
+        {isAdminNavigationOpen && (
+          <div className="border-t border-slate-200 bg-white px-4 py-4 shadow-xl space-y-4 animate-fade-in" id="admin-dropdown-menu">
+            <div className="flex flex-col gap-1">
+              <p className="text-[10px] font-mono tracking-widest text-slate-400 uppercase font-bold mb-2 px-3">
+                Management Modules
+              </p>
+              <button
+                onClick={() => { setActiveTab('overview'); setIsAdminNavigationOpen(false); }}
+                className={`w-full text-left py-2.5 px-3 rounded-lg text-sm font-semibold transition flex items-center gap-3 ${
+                  activeTab === 'overview' ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-600'
+                }`}
+              >
+                <BarChart3 className="w-4 h-4" />
+                Analytics Dashboard
+              </button>
+              <button
+                onClick={() => { setActiveTab('bookings'); setIsAdminNavigationOpen(false); }}
+                className={`w-full text-left py-2.5 px-3 rounded-lg text-sm font-semibold transition flex items-center justify-between ${
+                  activeTab === 'bookings' ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-600'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <CalendarDays className="w-4 h-4" />
+                  <span>Residency Bookings</span>
+                </div>
+                {analytics?.pendingApprovalsCount > 0 && (
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full font-bold bg-rose-500 text-white">
+                    {analytics.pendingApprovalsCount}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => { setActiveTab('rooms'); setIsAdminNavigationOpen(false); }}
+                className={`w-full text-left py-2.5 px-3 rounded-lg text-sm font-semibold transition flex items-center gap-3 ${
+                  activeTab === 'rooms' ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-600'
+                }`}
+              >
+                <KeyRound className="w-4 h-4" />
+                Rooms Status Matrix
+              </button>
+              <button
+                onClick={() => { setActiveTab('travel'); setIsAdminNavigationOpen(false); }}
+                className={`w-full text-left py-2.5 px-3 rounded-lg text-sm font-semibold transition flex items-center gap-3 ${
+                  activeTab === 'travel' ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-600'
+                }`}
+              >
+                <Truck className="w-4 h-4" />
+                Transit Shuttles Desk
+              </button>
+              <button
+                onClick={() => { setActiveTab('inquiries'); setIsAdminNavigationOpen(false); }}
+                className={`w-full text-left py-2.5 px-3 rounded-lg text-sm font-semibold transition flex items-center justify-between ${
+                  activeTab === 'inquiries' ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-600'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Mail className="w-4 h-4" />
+                  <span>Visitor Inquiries</span>
+                </div>
+                {analytics?.unreadInquiriesCount > 0 && (
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full font-bold bg-red-500 text-white">
+                    {analytics.unreadInquiriesCount}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => { setActiveTab('content'); setIsAdminNavigationOpen(false); }}
+                className={`w-full text-left py-2.5 px-3 rounded-lg text-sm font-semibold transition flex items-center gap-3 ${
+                  activeTab === 'content' ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-600'
+                }`}
+              >
+                <Plus className="w-4 h-4" />
+                Content & Reviews Editor
+              </button>
+
+              <div className="border-t border-slate-100 mt-2.5 pt-2.5">
+                <button
+                  onClick={onBackToWebsite}
+                  className="w-full text-left py-2.5 px-3 rounded-lg text-sm font-bold text-rose-600 hover:bg-rose-50 transition flex items-center gap-3 cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4 text-rose-500" />
+                  Logout & Exit to Website
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Main Admin Workspace Structure */}
       <div className="flex-1 flex flex-col lg:flex-row max-w-7xl w-full mx-auto p-4 sm:px-6 lg:px-8 gap-6 relative">
         
         {/* Left Side menu rail */}
-        <nav className={`${isAdminNavigationOpen ? 'flex' : 'hidden'} lg:flex absolute lg:relative top-4 left-4 right-4 z-30 lg:top-auto lg:left-auto lg:right-auto bg-slate-900 border border-slate-800 rounded-2xl p-4 flex-col gap-2 shrink-0 shadow-2xl lg:shadow-none lg:w-64`}>
+        <nav className="hidden lg:flex lg:relative bg-slate-900 border border-slate-800 rounded-2xl p-4 flex-col gap-2 shrink-0 lg:w-64">
           <p className="text-[10px] font-mono tracking-widest text-slate-500 uppercase font-black mb-3 px-3">
             Management Modules
           </p>
@@ -444,22 +525,16 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
             Content & Reviews Editor
           </button>
 
-          <div className="border-t border-slate-800 pt-4 p-2 text-[11px] text-slate-500 font-mono leading-relaxed space-y-1.5 lg:mt-auto">
-            <p>Database: localStorage (V3)</p>
-            <p>Admin: rr493377@gmail.com</p>
-            
+          <div className="mt-auto pt-4 border-t border-slate-800">
             <button
-              onClick={() => {
-                if (confirm('Verify: Would you like to clear the entire local database cache (rooms, bookings, and inquiries) to reset the system to a clean state?')) {
-                  localStorage.clear();
-                  window.location.reload();
-                }
-              }}
-              className="mt-2 w-full bg-rose-950/40 hover:bg-rose-900/50 border border-rose-800/60 text-rose-300 py-1.5 px-3 rounded-lg text-[10px] font-bold text-center transition cursor-pointer block"
+              onClick={onBackToWebsite}
+              className="w-full text-left font-semibold text-sm px-4 py-3 rounded-xl flex items-center gap-3 transition cursor-pointer text-rose-400 hover:bg-rose-955/20 hover:text-rose-300"
             >
-              Clear DB Storage Cache
+              <LogOut className="w-4.5 h-4.5" />
+              Logout & Exit Portal
             </button>
           </div>
+
         </nav>
 
         {/* Right workspace panels */}
