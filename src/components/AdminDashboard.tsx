@@ -148,7 +148,7 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-bold tracking-tight text-white font-sans">Guesthouse Operations & Back Office</h1>
                 <span className="bg-emerald-500/20 text-emerald-400 font-mono text-[10px] uppercase font-black px-2 py-0.5 rounded border border-emerald-500/30">
-                  Simulation Mode
+                  Production Mode
                 </span>
               </div>
               <p className="text-xs text-slate-400">Seenu Guest House, Tour's and Travels Operations Desk</p>
@@ -159,7 +159,7 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
             <button
               onClick={loadAllData}
               className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 p-2.5 rounded-lg transition"
-              title="Refresh simulator data"
+              title="Refresh real-time data"
             >
               <RefreshCw className="w-4 h-4" />
             </button>
@@ -174,11 +174,11 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
       </header>
 
       {/* Main Admin Workspace Structure */}
-      <div className="flex-1 flex flex-col md:flex-row max-w-7xl w-full mx-auto p-4 sm:px-6 lg:px-8 gap-6 overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row max-w-7xl w-full mx-auto p-4 sm:px-6 lg:px-8 gap-6">
         
         {/* Left Side menu rail */}
-        <nav className="md:w-64 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-1 shrink-0">
-          <p className="text-[10px] font-mono tracking-widest text-slate-500 uppercase font-black mb-3 px-3">
+        <nav className="w-full lg:w-64 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3 lg:flex lg:flex-col gap-2 shrink-0">
+          <p className="text-[10px] font-mono tracking-widest text-slate-500 uppercase font-black mb-3 px-3 sm:col-span-2 md:col-span-3 lg:col-span-1">
             Management Modules
           </p>
           <button
@@ -254,7 +254,7 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
             Content & Reviews Editor
           </button>
 
-          <div className="mt-auto border-t border-slate-800 pt-4 p-2 text-[11px] text-slate-500 font-mono leading-relaxed space-y-1">
+          <div className="border-t border-slate-800 pt-4 p-2 text-[11px] text-slate-500 font-mono leading-relaxed space-y-1 sm:col-span-2 md:col-span-3 lg:col-span-1 lg:mt-auto">
             <p>Database: localStorage</p>
             <p>Admin: rr493377@gmail.com</p>
             <p>Server Status: Active</p>
@@ -262,7 +262,7 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
         </nav>
 
         {/* Right workspace panels */}
-        <main className="flex-1 bg-slate-900 border border-slate-800 rounded-2xl p-6 overflow-y-auto max-h-[80vh]">
+        <main className="flex-1 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 lg:overflow-y-auto lg:max-h-[85vh]">
           {analytics === null ? (
             <div className="py-20 text-center text-slate-400">Loading analytic streams...</div>
           ) : (
@@ -384,11 +384,11 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
                     </div>
                   </div>
 
-                  {/* Simulator Tips banner */}
+                  {/* Back-Office Operations Guide */}
                   <div className="bg-emerald-950/40 border border-emerald-900/50 p-4 rounded-xl flex items-center gap-4">
                     <ShieldCheck className="w-6 h-6 text-emerald-400 shrink-0" />
                     <div className="text-xs text-emerald-200">
-                      <span className="font-bold uppercase tracking-wider block font-mono">Simulator Operational Hint:</span>
+                      <span className="font-bold uppercase tracking-wider block font-mono">Operations Desk Guide:</span>
                       <p className="font-light mt-0.5 leading-relaxed">
                         Navigate to the "Residency Bookings" tab, find a booking that is **Pending** or **Confirmed**, and check their request-in. You can assign rooms directly or mark their status as "Checked-In" to see the "Room Status Matrix" automatically flag that room as Occupied in real-time.
                       </p>
