@@ -324,8 +324,8 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
                     <p className="text-[10px] text-slate-400 font-mono">Set values to view dynamic calculations</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-150 px-2 py-0.5 rounded-full font-mono uppercase font-black tracking-wider animate-pulse">
+                <div className="text-right shrink-0 ml-2">
+                  <span className="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-200/60 px-2 py-0.5 rounded-full font-mono uppercase font-black tracking-wider animate-pulse whitespace-nowrap inline-block">
                     Live Rates
                   </span>
                 </div>
