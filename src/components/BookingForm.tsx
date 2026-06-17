@@ -15,7 +15,6 @@ interface BookingFormProps {
 }
 
 export default function BookingForm({ onClose, onSuccess, selectedCategory = 'Non-AC Single Room' }: BookingFormProps) {
-  const [formType, setFormType] = useState<'instant' | 'google-form'>('instant');
   const [guestName, setGuestName] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
@@ -258,11 +257,6 @@ and Patient UHID Card.
     }
   };
 
-  const handleGoogleFormSubmit = () => {
-    const googleFormBaseUrl = "https://forms.gle/pCrZeoYRmyJ7TAx48";
-    window.open(googleFormBaseUrl, '_blank');
-  };
-
   const calculateLivePrice = () => {
     if (!checkInDate || !checkOutDate) return null;
     try {
@@ -317,30 +311,6 @@ and Patient UHID Card.
             className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer text-lg font-light animate-none"
           >
             &times;
-          </button>
-        </div>
-
-        {/* Tab switch */}
-        <div className="flex border-b border-slate-100 shrink-0">
-          <button
-            onClick={() => setFormType('instant')}
-            className={`flex-1 py-3 text-center text-sm font-semibold border-b-2 transition cursor-pointer ${
-              formType === 'instant' 
-                ? 'border-blue-600 text-slate-900 bg-blue-50/20' 
-                : 'border-transparent text-slate-500 hover:text-slate-905 bg-slate-50/50'
-            }`}
-          >
-            ⚡ Direct Booking via WhatsApp
-          </button>
-          <button
-            onClick={() => setFormType('google-form')}
-            className={`flex-1 py-3 text-center text-sm font-semibold border-b-2 transition cursor-pointer ${
-              formType === 'google-form' 
-                ? 'border-blue-600 text-slate-900 bg-blue-50/20' 
-                : 'border-transparent text-slate-500 hover:text-slate-905 bg-slate-50/50'
-            }`}
-          >
-            📋 Alternative Google Form
           </button>
         </div>
 
@@ -554,49 +524,6 @@ and Patient UHID Card.
                 Finished & Close Window
               </button>
             </div>
-          ) : formType === 'google-form' ? (
-            <div className="py-2 space-y-6">
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3 text-sm text-blue-900">
-                <AlertCircle className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-semibold">Production Mode Integration:</p>
-                  <p className="font-light mt-1">
-                    To maintain zero maintenance server fees, we support connecting guest inquiries straight to your personal Google Sheet via a custom Google Form. This saves all entries securely on the cloud.
-                  </p>
-                </div>
-              </div>
-
-              <div className="border border-slate-150 rounded-xl p-5 space-y-4 bg-slate-50/50">
-                <h4 className="font-bold text-slate-900 text-base">Steps in Google Forms Connection:</h4>
-                <ol className="space-y-3 text-sm text-slate-600">
-                  <li className="flex gap-2">
-                    <span className="font-bold text-blue-600">1.</span>
-                    <span>Set up your fields (Name, Phone, Selected Room, State, Train Number, Medical Care needs).</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="font-bold text-blue-600">2.</span>
-                    <span>Paste your Google Form ID into your Environment Secrets.</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="font-bold text-blue-600">3.</span>
-                    <span>All submissions will automatically feed both into your Google Drive, and can optionally trigger instant SMS alerts to your phone.</span>
-                  </li>
-                </ol>
-              </div>
-
-              <div className="pt-4 flex flex-col gap-3">
-                <button
-                  type="button"
-                  onClick={handleGoogleFormSubmit}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition duration-200 shadow-sm text-sm cursor-pointer"
-                >
-                  Launch Demo Google Form Inquiry
-                </button>
-                <p className="text-center text-xs text-slate-400 font-light">
-                  Forms will open in a brand new browser tab safely.
-                </p>
-              </div>
-            </div>
           ) : (
             <form onSubmit={handleInstantSubmit} className="space-y-5">
               {errorMsg && (
@@ -718,12 +645,13 @@ and Patient UHID Card.
                       Expected Check-In *
                     </label>
                     <div className="relative">
+                      <Calendar className="absolute left-3 top-2.5 w-4 h-4 text-slate-405 text-slate-400 pointer-events-none" />
                       <input
                         type="date"
                         required
                         value={checkInDate}
                         onChange={(e) => setCheckInDate(e.target.value)}
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
+                        className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
                       />
                     </div>
                   </div>
@@ -733,12 +661,13 @@ and Patient UHID Card.
                       Expected Check-Out *
                     </label>
                     <div className="relative">
+                      <Calendar className="absolute left-3 top-2.5 w-4 h-4 text-slate-405 text-slate-400 pointer-events-none" />
                       <input
                         type="date"
                         required
                         value={checkOutDate}
                         onChange={(e) => setCheckOutDate(e.target.value)}
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
+                        className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
                       />
                     </div>
                   </div>
@@ -791,19 +720,21 @@ and Patient UHID Card.
               {/* Travel Services */}
 
               <div className="pt-2 border-t border-slate-100">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-mono uppercase tracking-widest text-blue-600 font-bold text-slate-500">
+                <div className="space-y-2">
+                  <h4 className="text-xs font-mono uppercase tracking-widest text-blue-600 font-bold text-slate-505 text-slate-500">
                     3. Travel & Logistics Assistance
                   </h4>
-                  <label className="flex items-center gap-1.5 text-xs text-blue-900 font-semibold cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={needTravel}
-                      onChange={(e) => setNeedTravel(e.target.checked)}
-                      className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    Requires Airport/Station Pickup
-                  </label>
+                  <div>
+                    <label className="inline-flex items-center gap-1.5 text-xs text-blue-900 font-semibold cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={needTravel}
+                        onChange={(e) => setNeedTravel(e.target.checked)}
+                        className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      Requires Airport/Station Pickup
+                    </label>
+                  </div>
                 </div>
 
                 {needTravel && (
@@ -883,7 +814,7 @@ and Patient UHID Card.
                   disabled={isSubmitting}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition duration-200 shadow-sm text-sm cursor-pointer flex items-center justify-center gap-1.5"
                 >
-                  {isSubmitting ? 'Formatting Details...' : 'Book Now & Open on WhatsApp ⚡'}
+                  {isSubmitting ? 'Formatting Details...' : 'Book Now'}
                 </button>
               </div>
             </form>
