@@ -10,8 +10,10 @@ import {
   BarChart3, CalendarDays, KeyRound, Truck, 
   Mail, Settings, CheckCircle2, AlertCircle, Trash2, 
   User, RefreshCw, IndianRupee, ShieldCheck, MapPin, 
-  Maximize2, Plus, Edit2, Check, X, ShieldAlert, Menu, Upload, LogOut
+  Maximize2, Plus, Edit2, Check, X, ShieldAlert, Menu, Upload, LogOut,
+  QrCode, ScanLine
 } from 'lucide-react';
+import QRCode from 'qrcode';
 
 interface AdminDashboardProps {
   onBackToWebsite: () => void;
@@ -79,6 +81,17 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
   const [manualSpecialInstructions, setManualSpecialInstructions] = useState('');
   const [manualPatientCardNo, setManualPatientCardNo] = useState('');
 
+  // Guest QR Check-In Scanner and Viewer states
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [scannedBooking, setScannedBooking] = useState<Booking | null>(null);
+  const [isScanningActive, setIsScanningActive] = useState(false);
+  const [qrScanInputType, setQrScanInputType] = useState<string>('');
+  const [scannerErrorMessage, setScannerErrorMessage] = useState('');
+  const [scannerSuccessMessage, setScannerSuccessMessage] = useState('');
+  const [scannerSelectedRoom, setScannerSelectedRoom] = useState('');
+  const [viewingQrBookingId, setViewingQrBookingId] = useState<string | null>(null);
+  const [activeQrCodeUrl, setActiveQrCodeUrl] = useState<string>('');
+
   useEffect(() => {
     loadAllData();
   }, []);
@@ -137,6 +150,48 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
     dbService.updateDriverDetails(srvId, newDriverName, newDriverContact);
     setEditingDriverServiceId(null);
     loadAllData();
+  };
+
+  const handleSimulateScan = (bookingId: string) => {
+    if (!bookingId) return;
+    setIsScanningActive(true);
+    setScannerErrorMessage('');
+    setScannerSuccessMessage('');
+    setScannedBooking(null);
+    setScannerSelectedRoom('');
+    
+    // Simulate high-speed camera decoders
+    setTimeout(() => {
+      const match = dbService.getBookings().find(b => b.id === bookingId);
+      setIsScanningActive(false);
+      if (match) {
+        setScannedBooking(match);
+        setScannerSuccessMessage(`Simulated scan complete: Recognized ID ${match.id}`);
+        if (match.assignedRoomId) {
+          setScannerSelectedRoom(match.assignedRoomId);
+        }
+      } else {
+        setScannerErrorMessage('Decoder Error: QR payload signature does not match any register in database.');
+      }
+    }, 1200);
+  };
+
+  const handleScannerCheckIn = () => {
+    if (!scannedBooking) return;
+    try {
+      dbService.updateBookingStatus(scannedBooking.id, 'CheckedIn', scannerSelectedRoom || undefined);
+      setScannerSuccessMessage(`Instant Check-In completed successfully! Registered Room assignment.`);
+      setScannedBooking(null);
+      setScannerSelectedRoom('');
+      loadAllData();
+      
+      setTimeout(() => {
+        setIsScannerOpen(false);
+        setScannerSuccessMessage('');
+      }, 1800);
+    } catch (e: any) {
+      setScannerErrorMessage('Checkout operation failed.');
+    }
   };
 
   const handleAddTestimonial = (e: React.FormEvent) => {
@@ -688,6 +743,24 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
                     
                     <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
                       <button
+                        onClick={() => {
+                          setIsScannerOpen(!isScannerOpen);
+                          setScannedBooking(null);
+                          setScannerErrorMessage('');
+                          setScannerSuccessMessage('');
+                        }}
+                        className={`border font-bold px-4 py-2.5 rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer w-full sm:w-auto justify-center ${
+                          isScannerOpen 
+                            ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-extrabold shadow-lg shadow-emerald-500/20 animate-pulse' 
+                            : 'bg-slate-800 hover:bg-slate-700 hover:text-emerald-400 text-white border-slate-700'
+                        }`}
+                        id="back-office-qr-scanner-btn"
+                      >
+                        <ScanLine className={`w-3.5 h-3.5 ${isScannerOpen ? 'text-slate-950' : 'text-emerald-400'}`} /> 
+                        <span>{isScannerOpen ? 'Deactivate Scanner' : 'Front Desk QR Scanner'}</span>
+                      </button>
+
+                      <button
                         onClick={() => setIsManualBookingFormOpen(true)}
                         className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer shadow-lg w-full sm:w-auto justify-center"
                         id="back-office-walk-in-btn"
@@ -711,6 +784,186 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
                       </div>
                     </div>
                   </div>
+
+                  {/* Simulated laser scan style injection */}
+                  <style>{`
+                    @keyframes scanLaserAnim {
+                      0% { top: 4%; }
+                      50% { top: 96%; }
+                      100% { top: 4%; }
+                    }
+                    .animate-scan-laser-line {
+                      animation: scanLaserAnim 2s infinite linear;
+                    }
+                  `}</style>
+
+                  {/* Front Desk QR Code Scanner Mock Terminal */}
+                  {isScannerOpen && (
+                    <div id="front-desk-qr-scanner-terminal" className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 space-y-6 animate-scale-up">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800/60 pb-4">
+                        <div className="flex items-center gap-2.5">
+                          <div className="p-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg">
+                            <QrCode className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <h3 className="font-extrabold text-white text-sm sm:text-base">Front Desk Digital Check-In QR Scanner</h3>
+                            <p className="text-[11px] text-slate-400 font-light">Simulate real-world verification of custom guest reservation QR codes</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setIsScannerOpen(false);
+                            setScannedBooking(null);
+                            setScannerErrorMessage('');
+                            setScannerSuccessMessage('');
+                          }}
+                          className="text-xs text-slate-400 hover:text-white px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-xl transition cursor-pointer"
+                        >
+                          Deactivate Camera
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        {/* Box 1: Simulated Camera Viewfinder */}
+                        <div className="lg:col-span-6 space-y-3">
+                          <span className="text-[10px] uppercase font-bold text-slate-400 font-mono tracking-wider block">Terminal Camera Viewport</span>
+                          <div className="relative aspect-[4/3] bg-black/90 border-2 border-slate-800 rounded-xl overflow-hidden flex flex-col items-center justify-center">
+                            {/* Camera corner accents */}
+                            <div className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-slate-500 rounded-tl" />
+                            <div className="absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 border-slate-500 rounded-tr" />
+                            <div className="absolute bottom-4 left-4 w-4 h-4 border-b-2 border-l-2 border-slate-500 rounded-bl" />
+                            <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-slate-500 rounded-br" />
+
+                            {/* Center targeting reticle */}
+                            <div className="w-48 h-48 sm:w-56 sm:h-56 border border-dashed border-slate-750/70 rounded-2xl flex items-center justify-center relative">
+                              {isScanningActive && (
+                                <div className="absolute left-[3px] right-[3px] h-[2px] bg-emerald-500 shadow-md shadow-emerald-400 animate-scan-laser-line" />
+                              )}
+                              
+                              {scannedBooking ? (
+                                <CheckCircle2 className="w-16 h-16 text-emerald-400 animate-pulse" />
+                              ) : isScanningActive ? (
+                                <span className="text-emerald-400 font-mono text-[10px] uppercase tracking-widest animate-pulse">Decoding barcode matrix...</span>
+                              ) : (
+                                <div className="text-center space-y-2 p-2 text-slate-600">
+                                  <ScanLine className="w-10 h-10 mx-auto text-slate-500 animate-pulse" />
+                                  <p className="text-[10px] font-mono select-none tracking-wider text-slate-500">READY TO SCAN</p>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Camera live indicators */}
+                            <div className="absolute top-3 left-3 bg-red-600 px-1.5 py-0.5 rounded text-[8px] font-mono text-white flex items-center gap-1 uppercase tracking-widest font-black animate-pulse select-none">
+                              <span className="w-1.5 h-1.5 bg-white rounded-full" /> Live Desk Feed
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Box 2: Controls & Decoded Metadata */}
+                        <div className="lg:col-span-6 space-y-4 text-left">
+                          <div className="space-y-2">
+                            <label className="text-[10px] uppercase font-bold text-slate-400 font-mono tracking-wider block">Choose Guest QR Voucher to scan:</label>
+                            <div className="flex gap-2">
+                              <select
+                                value={qrScanInputType}
+                                onChange={(e) => setQrScanInputType(e.target.value)}
+                                className="flex-1 bg-slate-950 border border-slate-800 text-xs text-white rounded-xl px-3 py-2.5 focus:outline-none focus:border-emerald-500"
+                              >
+                                <option value="">Select Checked Guest's QR Voucher...</option>
+                                {bookings
+                                  .filter(b => b.status === 'Pending' || b.status === 'Confirmed')
+                                  .map(b => (
+                                    <option key={b.id} value={b.id}>
+                                      {b.guestName} ({b.roomCategory}) [{b.id.substring(8)}]
+                                    </option>
+                                  ))}
+                              </select>
+                              <button
+                                type="button"
+                                disabled={!qrScanInputType || isScanningActive}
+                                onClick={() => handleSimulateScan(qrScanInputType)}
+                                className="bg-emerald-500 hover:bg-emerald-450 text-slate-950 font-extrabold text-xs px-4 py-2.5 rounded-xl transition disabled:bg-slate-800 disabled:text-slate-600 cursor-pointer"
+                              >
+                                {isScanningActive ? 'Decoding...' : 'Scan Pass'}
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Messages */}
+                          {scannerErrorMessage && (
+                            <div className="p-3 bg-rose-950/40 border border-rose-900/50 text-rose-300 rounded-xl text-xs flex gap-2">
+                              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                              <span>{scannerErrorMessage}</span>
+                            </div>
+                          )}
+
+                          {scannerSuccessMessage && (
+                            <div className="p-3 bg-emerald-950/40 border border-emerald-900/50 text-emerald-300 rounded-xl text-xs flex gap-2">
+                              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+                              <span>{scannerSuccessMessage}</span>
+                            </div>
+                          )}
+
+                          {/* Loaded Guest verification card */}
+                          {scannedBooking && (
+                            <div className="bg-slate-950 border border-slate-800/80 p-4 rounded-xl space-y-3.5 animate-scale-up">
+                              <div className="flex justify-between items-start border-b border-slate-800/40 pb-2">
+                                <div>
+                                  <span className="text-[10px] font-mono bg-blue-950 text-blue-400 px-2 py-0.5 rounded font-black uppercase">Decoded Pass</span>
+                                  <h4 className="font-bold text-white text-sm sm:text-base mt-1">{scannedBooking.guestName}</h4>
+                                  <p className="text-slate-400 font-mono text-[10px]">{scannedBooking.guestPhone} | State: {scannedBooking.guestState}</p>
+                                </div>
+                                <span className="bg-amber-500/10 text-amber-300 text-[10px] px-1.5 py-0.5 rounded border border-amber-500/20 font-bold uppercase font-mono">
+                                  {scannedBooking.status}
+                                </span>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-3 text-xs">
+                                <div>
+                                  <span className="text-slate-500 text-[10px] block font-mono uppercase tracking-wider">ROOM PREFERENCE</span>
+                                  <p className="font-bold text-slate-100 mt-0.5">{scannedBooking.roomCategory}</p>
+                                </div>
+                                <div>
+                                  <span className="text-slate-500 text-[10px] block font-mono uppercase tracking-wider">EXPECTED RANGE</span>
+                                  <p className="text-slate-200 mt-0.5">In: {scannedBooking.checkInDate}</p>
+                                  <p className="text-slate-200">Out: {scannedBooking.checkOutDate}</p>
+                                </div>
+                              </div>
+
+                              {/* Assign Room Selector if not pre-assigned */}
+                              <div className="pt-2 border-t border-slate-800/40 space-y-2">
+                                <label className="text-[10px] uppercase font-bold text-slate-400 font-mono tracking-wider block">Assign Available Key Room:</label>
+                                <select
+                                  value={scannerSelectedRoom}
+                                  onChange={(e) => setScannerSelectedRoom(e.target.value)}
+                                  className="w-full bg-slate-900 border border-slate-800 text-xs text-white rounded-lg px-2.5 py-2 focus:outline-none"
+                                >
+                                  <option value="">Select guest key placement...</option>
+                                  {rooms
+                                    .filter(room => room.category === scannedBooking.roomCategory && (room.status === 'Available' || room.id === scannedBooking.assignedRoomId))
+                                    .map(room => (
+                                      <option key={room.id} value={room.id}>
+                                        Room {room.roomNumber} ({room.status})
+                                      </option>
+                                    ))}
+                                </select>
+                              </div>
+
+                              <button
+                                type="button"
+                                disabled={!scannerSelectedRoom}
+                                onClick={handleScannerCheckIn}
+                                className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold text-xs uppercase tracking-wider py-2.5 rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow"
+                              >
+                                <CheckCircle2 className="w-4 h-4" />
+                                <span>Fast-Track Guest Check-In</span>
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Manual Walk-in Booking centered modal form overlay */}
                   {isManualBookingFormOpen && (
@@ -1035,10 +1288,26 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
 
                                 <button
                                   onClick={() => handleDeleteBooking(bk.id)}
-                                  className="text-slate-500 hover:text-red-400 p-1.5 rounded transition"
+                                  className="text-slate-500 hover:text-red-400 p-1.5 rounded transition cursor-pointer"
                                   title="Delete record"
                                 >
                                   <Trash2 className="w-4 h-4" />
+                                </button>
+
+                                <button
+                                  onClick={() => {
+                                    const qrPayload = `SEENU GUEST HOUSE RESERVATION\nID: ${bk.id}\nGuest: ${bk.guestName}\nRoom: ${bk.roomCategory}\nStay: ${bk.checkInDate} to ${bk.checkOutDate}\nTotal: ₹${bk.totalAmount}\nStatus: ${bk.status}`;
+                                    QRCode.toDataURL(qrPayload, { margin: 2 })
+                                      .then(url => {
+                                        setViewingQrBookingId(bk.id);
+                                        setActiveQrCodeUrl(url);
+                                      })
+                                      .catch(err => console.error(err));
+                                  }}
+                                  className="text-slate-400 hover:text-blue-400 p-1.5 rounded transition cursor-pointer"
+                                  title="Show Check-In QR"
+                                >
+                                  <QrCode className="w-4 h-4" />
                                 </button>
                               </div>
                             </div>
@@ -1675,6 +1944,67 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
             </>
           )}
         </main>
+
+        {/* Back Office Voucher QR Overlay Modal */}
+        {viewingQrBookingId && activeQrCodeUrl && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in text-left">
+            <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl max-w-sm w-full space-y-4 shadow-2xl relative text-center">
+              <button
+                onClick={() => {
+                  setViewingQrBookingId(null);
+                  setActiveQrCodeUrl('');
+                }}
+                className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              
+              <div className="mx-auto w-12 h-12 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-full flex items-center justify-center">
+                <QrCode className="w-6 h-6" />
+              </div>
+
+              <div>
+                <h3 className="text-white font-bold text-base">Check-In Voucher QR</h3>
+                <p className="text-xs text-slate-400 mt-1">Scanner verified ticket for fast desk check-in</p>
+              </div>
+
+              <div className="bg-white p-3 rounded-xl border border-slate-700/50 w-fit mx-auto shadow-inner">
+                <img src={activeQrCodeUrl} alt="Voucher QR Code" className="w-48 h-48" />
+              </div>
+
+              <div className="text-xs font-mono bg-slate-950 text-slate-400 p-2.5 rounded-lg text-left space-y-1 overflow-x-auto">
+                <p><span className="text-slate-500 font-bold">RES ID:</span> {viewingQrBookingId}</p>
+                <p><span className="text-slate-500 font-bold">GUEST :</span> {bookings.find(b => b.id === viewingQrBookingId)?.guestName}</p>
+                <p><span className="text-slate-500 font-bold">ROOM  :</span> {bookings.find(b => b.id === viewingQrBookingId)?.roomCategory}</p>
+              </div>
+
+              <div className="flex gap-2.5 pt-1">
+                <button
+                  onClick={() => {
+                    const a = document.createElement('a');
+                    a.href = activeQrCodeUrl;
+                    a.download = `Voucher_QR_${viewingQrBookingId}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                  }}
+                  className="flex-1 bg-slate-850 hover:bg-slate-800 border border-slate-850 hover:border-slate-800 text-white font-semibold text-xs py-2 rounded-xl transition cursor-pointer"
+                >
+                  Download PNG
+                </button>
+                <button
+                  onClick={() => {
+                    setViewingQrBookingId(null);
+                    setActiveQrCodeUrl('');
+                  }}
+                  className="flex-1 bg-blue-600 hover:bg-blue-550 text-white font-bold text-xs py-2 rounded-xl transition cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

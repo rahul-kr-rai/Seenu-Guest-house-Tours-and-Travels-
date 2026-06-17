@@ -5,7 +5,8 @@
 
 import React, { useState } from 'react';
 import { dbService } from '../services/dataService';
-import { Calendar, User, Phone, MapPin, ClipboardList, Plane, CheckCircle2, AlertCircle, Sparkles, HelpCircle, Copy, ExternalLink } from 'lucide-react';
+import { Calendar, User, Phone, MapPin, ClipboardList, Plane, CheckCircle2, AlertCircle, Sparkles, HelpCircle, Copy, ExternalLink, QrCode } from 'lucide-react';
+import QRCode from 'qrcode';
 
 interface BookingFormProps {
   onClose: () => void;
@@ -34,6 +35,7 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
   const [generatedTicket, setGeneratedTicket] = useState('');
   const [whatsappUrl, setWhatsappUrl] = useState('');
   const [copied, setCopied] = useState(false);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
 
   const roomCategories = [
     'Non-AC Single Room',
@@ -90,7 +92,7 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
       const calculatedAmt = baseCost - savedAmount;
 
       // Persist in local database so Manager Office Dashboard can still track demo bookings correctly!
-      dbService.addBooking({
+      const newBooking = dbService.addBooking({
         guestName,
         guestPhone,
         guestEmail,
@@ -109,6 +111,22 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
         } : undefined,
         specialInstructions
       });
+
+      // Generate a unique check-in QR Code payload
+      const qrPayload = `SEENU GUEST HOUSE RESERVATION\nID: ${newBooking.id}\nGuest: ${newBooking.guestName}\nRoom: ${newBooking.roomCategory}\nStay: ${newBooking.checkInDate} to ${newBooking.checkOutDate}\nTotal: ₹${calculatedAmt}\nStatus: PENDING CHECK-IN`;
+      QRCode.toDataURL(qrPayload, {
+        margin: 2,
+        color: {
+          dark: '#1e293b',
+          light: '#ffffff'
+        }
+      })
+        .then(url => {
+          setQrCodeDataUrl(url);
+        })
+        .catch(err => {
+          console.error('Failed to generate local QR code', err);
+        });
 
       // Construct the formatted ticket
       const pickupTxt = needTravel ? 'Yes' : 'No';
@@ -287,6 +305,40 @@ and Patient UHID Card.
               <p className="text-slate-500 text-xs mt-1 max-w-md">
                 Your reservation details are compiled successfully. Copy your ticket below or open directly in WhatsApp to secure your booking instantly with Seenu Guest House.
               </p>
+
+              {/* Unique Check-In QR Code Card */}
+              {qrCodeDataUrl && (
+                <div id="booking-success-qrcode-card" className="w-full mt-4 bg-slate-50 border border-slate-200/80 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 shadow-sm">
+                  <div className="bg-white p-2.5 rounded-xl shadow-md border border-slate-200 shrink-0 flex items-center justify-center">
+                    <img src={qrCodeDataUrl} alt="Check-In QR Code" className="w-32 h-32 sm:w-36 sm:h-36" />
+                  </div>
+                  <div className="text-left space-y-2 flex-1">
+                    <div className="flex items-center gap-1.5 text-blue-600 bg-blue-50/50 px-2.5 py-1 rounded-full w-fit">
+                      <QrCode className="w-3.5 h-3.5" />
+                      <span className="text-[10px] uppercase font-black tracking-widest font-mono">Check-In Passport QR</span>
+                    </div>
+                    <h3 className="font-bold text-slate-800 text-xs sm:text-sm">Instant Front Desk Verification</h3>
+                    <p className="text-slate-500 text-[11px] leading-relaxed font-light">
+                      This QR matches your cloud booking. Our front desk staff will scan this upon arrival at CMC Jubilee Gate or Seenu Guest House desk to instantly verify your ID and assign keys without manual paperwork.
+                    </p>
+                    <div className="pt-1.5 flex gap-2">
+                      <button
+                        onClick={() => {
+                          const a = document.createElement('a');
+                          a.href = qrCodeDataUrl;
+                          a.download = `SeenuGuestHouse_CheckIn_QR.png`;
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                        }}
+                        className="text-[10px] bg-slate-900 hover:bg-slate-800 text-white font-bold px-3 py-1.5 rounded-lg transition cursor-pointer border border-transparent flex items-center gap-1 shadow-sm"
+                      >
+                        Download Ticket QR
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* High-fidelity visual mockup of the ticket voucher itself */}
               <div className="w-full mt-4 text-left bg-slate-950 text-[#10b981] p-4 rounded-xl font-mono text-[11px] sm:text-xs overflow-x-auto whitespace-pre border border-slate-800 shadow-inner max-h-[280px]">
