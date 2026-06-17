@@ -69,6 +69,30 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
   const [heroDays, setHeroDays] = useState(5);
   const [heroTransit, setHeroTransit] = useState('none');
 
+  // Helper to dynamically resolve the price of calculator categories based on current rooms loaded in state
+  const getCalculatorRoomPrice = (cat: string, fallbackPrice: number): number => {
+    // 1. Try exact category name match
+    const exactMatch = rooms.find(r => r.category.toLowerCase() === cat.toLowerCase());
+    if (exactMatch) return exactMatch.pricePerDay;
+
+    // 2. Try partial matching based on common search strings
+    let substringMatch: typeof exactMatch | undefined;
+    if (cat === 'Non-AC Single Room') {
+      substringMatch = rooms.find(r => r.category.toLowerCase().includes('non-ac single') || r.category.toLowerCase().includes('single non-ac'));
+    } else if (cat === 'Non-AC Family Room') {
+      substringMatch = rooms.find(r => r.category.toLowerCase().includes('family') || r.category.toLowerCase().includes('double') || r.category.toLowerCase().includes('balcony'));
+    } else if (cat === 'Standard AC Room') {
+      substringMatch = rooms.find(r => r.category.toLowerCase().includes('standard ac') || r.category.toLowerCase().includes('ac double') || r.category.toLowerCase().includes('ac single'));
+    } else if (cat === 'Premium Kitchen Suite') {
+      substringMatch = rooms.find(r => r.category.toLowerCase().includes('suite') || r.category.toLowerCase().includes('kitchen') || r.category.toLowerCase().includes('premium'));
+    }
+
+    if (substringMatch) return substringMatch.pricePerDay;
+
+    // 3. Absolute fallback
+    return fallbackPrice;
+  };
+
   // Contact form state
   const [senderName, setSenderName] = useState('');
   const [senderPhone, setSenderPhone] = useState('');
@@ -301,7 +325,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/60 to-slate-900/20" />
           
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full relative z-10 flex flex-col justify-end pb-8 sm:pb-12 text-left">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full relative z-10 flex flex-col justify-end items-center pb-8 sm:pb-12 text-center">
             {/* Floating Distance Badge inside the banner */}
             <div className="inline-flex items-center gap-2 bg-blue-600 text-white px-3.5 py-1.5 rounded-full text-[10px] font-black font-mono tracking-wider uppercase w-fit mb-4 shadow-md border border-blue-400/20">
               <MapPin className="w-3.5 h-3.5 animate-pulse" />
@@ -309,19 +333,19 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
             </div>
 
             {/* Banner Content */}
-            <div className="space-y-4 max-w-2xl">
+            <div className="space-y-4 max-w-2xl mx-auto">
               <h2 className="text-2xl sm:text-3xl md:text-4.5xl lg:text-5xl font-black font-sans tracking-tight text-white leading-tight drop-shadow-md">
-                Your Peaceful Recovery Haven <br className="hidden sm:inline"/>
+                Get rooms at <br className="hidden sm:inline"/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300 font-extrabold">
-                  With Premium Patient Care
+                  Most affordable price.
                 </span>
               </h2>
               
-              <p className="text-slate-200 text-xs sm:text-sm md:text-base leading-relaxed font-light drop-shadow-sm max-w-xl">
+              <p className="text-slate-200 text-xs sm:text-sm md:text-base leading-relaxed font-light drop-shadow-sm max-w-xl mx-auto">
                 Seenu Guest House delivers spotless, noise-insulated lodging accommodations optimized specifically for patients & relatives visiting Christian Medical College (CMC) Vellore. Relax with pristine home-style cooking access, 24/7 pure RO water, bilingual translation, and seamless railway transit.
               </p>
 
-              <div className="flex flex-wrap gap-3 pt-2">
+              <div className="flex flex-wrap justify-center gap-3 pt-2">
                 <button 
                   onClick={() => scrollToSection('rooms-section')}
                   className="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-extrabold px-6 py-3.5 rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-lg shadow-blue-500/25 border border-blue-400/25 hover:scale-[1.02] active:scale-[0.98] duration-200"
@@ -457,23 +481,26 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
                     { cat: 'Non-AC Family Room', label: 'Family Non-AC', price: 750, info: 'Spacious, induction cook' },
                     { cat: 'Standard AC Room', label: 'Standard AC', price: 1150, info: 'Cool recovery, geyser, TV' },
                     { cat: 'Premium Kitchen Suite', label: 'Kitchen Suite', price: 1650, info: 'Exclusive private kitchen' }
-                  ].map((tier) => (
-                    <button
-                      key={tier.cat}
-                      onClick={() => setHeroRoomCat(tier.cat)}
-                      className={`text-left p-3 rounded-2xl border text-xs transition duration-250 cursor-pointer ${
-                        heroRoomCat === tier.cat
-                          ? 'bg-blue-50/65 border-blue-500 ring-2 ring-blue-500/10'
-                          : 'bg-slate-50/50 hover:bg-slate-100 border-slate-200 hover:border-slate-300'
-                      }`}
-                    >
-                      <div className="flex justify-between items-center font-bold">
-                        <span className={heroRoomCat === tier.cat ? 'text-blue-700 font-bold' : 'text-slate-700 font-semibold'}>{tier.label}</span>
-                        <span className="font-mono text-[10px] text-emerald-600">₹{tier.price}/d</span>
-                      </div>
-                      <p className="text-[9px] text-slate-450 leading-tight mt-1 font-light">{tier.info}</p>
-                    </button>
-                  ))}
+                  ].map((tier) => {
+                    const currentPrice = getCalculatorRoomPrice(tier.cat, tier.price);
+                    return (
+                      <button
+                        key={tier.cat}
+                        onClick={() => setHeroRoomCat(tier.cat)}
+                        className={`text-left p-3 rounded-2xl border text-xs transition duration-250 cursor-pointer ${
+                          heroRoomCat === tier.cat
+                            ? 'bg-blue-50/65 border-blue-500 ring-2 ring-blue-500/10'
+                            : 'bg-slate-50/50 hover:bg-slate-100 border-slate-200 hover:border-slate-300'
+                        }`}
+                      >
+                        <div className="flex justify-between items-center font-bold">
+                          <span className={heroRoomCat === tier.cat ? 'text-blue-700 font-bold' : 'text-slate-700 font-semibold'}>{tier.label}</span>
+                          <span className="font-mono text-[10px] text-emerald-600">₹{currentPrice}/d</span>
+                        </div>
+                        <p className="text-[9px] text-slate-450 leading-tight mt-1 font-light">{tier.info}</p>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -558,7 +585,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
               <div className="bg-slate-900 text-slate-100 p-4 rounded-2xl font-mono text-xs space-y-1.5 shadow-inner">
                 <div className="flex justify-between text-slate-400">
                   <span>Stay Code: {heroRoomCat}</span>
-                  <span>₹{heroRoomCat === 'Non-AC Single Room' ? 450 : heroRoomCat === 'Non-AC Family Room' ? 750 : heroRoomCat === 'Standard AC Room' ? 1150 : 1650} x {heroDays}d</span>
+                  <span>₹{getCalculatorRoomPrice(heroRoomCat, heroRoomCat === 'Non-AC Single Room' ? 450 : heroRoomCat === 'Non-AC Family Room' ? 750 : heroRoomCat === 'Standard AC Room' ? 1150 : 1650)} x {heroDays}d</span>
                 </div>
                 {heroTransit !== 'none' && (
                   <div className="flex justify-between text-slate-400">
@@ -572,7 +599,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
                     <span className="text-[10px] text-blue-400 font-light normal-case">(Pay on check-in)</span>
                   </span>
                   <span className="text-emerald-400 font-mono text-base font-black">
-                    ₹{((heroRoomCat === 'Non-AC Single Room' ? 450 : heroRoomCat === 'Non-AC Family Room' ? 750 : heroRoomCat === 'Standard AC Room' ? 1150 : 1650) * heroDays + (heroTransit === 'none' ? 0 : heroTransit === 'katpadi' ? 350 : heroTransit === 'chennai' ? 3500 : 6000)).toLocaleString('en-IN')}
+                    ₹{(getCalculatorRoomPrice(heroRoomCat, heroRoomCat === 'Non-AC Single Room' ? 450 : heroRoomCat === 'Non-AC Family Room' ? 750 : heroRoomCat === 'Standard AC Room' ? 1150 : 1650) * heroDays + (heroTransit === 'none' ? 0 : heroTransit === 'katpadi' ? 350 : heroTransit === 'chennai' ? 3500 : 6000)).toLocaleString('en-IN')}
                   </span>
                 </div>
               </div>
