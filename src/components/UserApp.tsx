@@ -14,7 +14,7 @@ import {
   Phone, Globe, CheckCircle2, Star, Send, 
   HelpCircle, MessageSquare, ClipboardCheck, ArrowRight, MapPin,
   MessageCircle, Menu, X, Calculator, Plus, Minus, Car, Award,
-  QrCode, Calendar, ClipboardList
+  QrCode, Calendar, ClipboardList, ArrowUp
 } from 'lucide-react';
 
 interface UserAppProps {
@@ -40,6 +40,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
   const [whatsAppCheckInConfirmed, setWhatsAppCheckInConfirmed] = useState(false);
   const [scannedRoomNo, setScannedRoomNo] = useState<string>('TBD');
   const [isConfirmingWA, setIsConfirmingWA] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   const handleToggleCompare = (roomId: string) => {
     setSelectedComparisonRooms(prev => {
@@ -160,6 +161,24 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   return (
     <div className="bg-slate-50 text-slate-800 min-h-screen font-sans">
@@ -1142,27 +1161,17 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
         </div>
       )}
 
-      {/* Floating real-time WhatsApp action button */}
-      <a 
-        href="https://wa.me/919360211223?text=Hello%20Seenu%20Guest%20House%2C%20I%20am%20inquiring%2520about%2520room%2520availability%2520and%2520travel%2520assistance."
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 group flex items-center gap-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 p-3 sm:py-3.5 sm:px-4.5 rounded-full sm:rounded-2xl shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300"
-        title="Chat on WhatsApp"
-        id="whatsapp-floating-action"
-      >
-        <div className="relative flex items-center">
-          <MessageCircle className="w-5 h-5 text-white fill-white" />
-          <span className="absolute -top-1 -right-1 flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-          </span>
-        </div>
-        <div className="hidden sm:flex flex-col text-left leading-none">
-          <p className="text-[9px] font-mono font-bold text-slate-950 uppercase tracking-wider">Instant Support</p>
-          <p className="text-xs font-bold text-white mt-0.5">Chat on WhatsApp</p>
-        </div>
-      </a>
+      {/* Scroll To Top button */}
+      {showScrollTop && (
+        <button 
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 z-50 p-3 sm:p-4 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer border border-blue-400/20"
+          title="Scroll to Top"
+          id="scroll-to-top"
+        >
+          <ArrowUp className="w-5 h-5 sm:w-6 sm:h-6" />
+        </button>
+      )}
     </div>
   );
 }
