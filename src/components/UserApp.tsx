@@ -189,11 +189,8 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
           </div>
 
           <nav className="hidden lg:flex items-center gap-6 text-sm font-semibold text-slate-600 shrink-0">
-            <button onClick={() => scrollToSection('features-section')} className="hover:text-blue-600 cursor-pointer">Amenities</button>
             <button onClick={() => scrollToSection('rooms-section')} className="hover:text-blue-600 cursor-pointer">Rooms & Pricing</button>
-            <button onClick={() => scrollToSection('travel-section')} className="hover:text-blue-600 cursor-pointer">Airport Pickups</button>
             <button onClick={() => scrollToSection('interactive-map-section')} className="hover:text-blue-600 cursor-pointer">Location Guide</button>
-            <button onClick={() => scrollToSection('testimonials-section')} className="hover:text-blue-600 cursor-pointer">Testimonials</button>
             <button onClick={() => scrollToSection('faq-section')} className="hover:text-blue-600 cursor-pointer">Support FAQs</button>
           </nav>
 
@@ -232,34 +229,16 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
           <div className="lg:hidden border-t border-slate-200 bg-white px-4 py-4 shadow-xl space-y-4 animate-fade-in" id="mobile-navigation-dropdown">
             <div className="flex flex-col gap-1">
               <button 
-                onClick={() => { scrollToSection('features-section'); setIsMobileMenuOpen(false); }} 
-                className="w-full text-left py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition"
-              >
-                Amenities
-              </button>
-              <button 
                 onClick={() => { scrollToSection('rooms-section'); setIsMobileMenuOpen(false); }} 
                 className="w-full text-left py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition"
               >
                 Rooms & Pricing
               </button>
               <button 
-                onClick={() => { scrollToSection('travel-section'); setIsMobileMenuOpen(false); }} 
-                className="w-full text-left py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition"
-              >
-                Airport Pickups
-              </button>
-              <button 
                 onClick={() => { scrollToSection('interactive-map-section'); setIsMobileMenuOpen(false); }} 
                 className="w-full text-left py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition"
               >
                 Location Guide
-              </button>
-              <button 
-                onClick={() => { scrollToSection('testimonials-section'); setIsMobileMenuOpen(false); }} 
-                className="w-full text-left py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition"
-              >
-                Testimonials
               </button>
               <button 
                 onClick={() => { scrollToSection('faq-section'); setIsMobileMenuOpen(false); }} 
@@ -599,84 +578,9 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
         </div>
       </section>
 
-      {/* Trust & Location Stats Header */}
-      <section className="bg-slate-50 border-y border-slate-200 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          <div>
-            <p className="text-2xl md:text-3xl font-black text-blue-600 font-mono">350m</p>
-            <p className="text-xs md:text-sm text-gray-500 font-light font-sans mt-0.5">Walk to CMC Jubilee Gate Bus Stop</p>
-          </div>
-          <div className="border-l border-slate-200">
-            <p className="text-2xl md:text-3xl font-black text-blue-600 font-mono">24/7</p>
-            <p className="text-xs md:text-sm text-gray-500 font-light font-sans mt-0.5">Chennai & Bangalore Airport Cab</p>
-          </div>
-          <div className="border-l-0 md:border-l border-slate-200">
-            <p className="text-2xl md:text-3xl font-black text-blue-600 font-mono">100%</p>
-            <p className="text-xs md:text-sm text-gray-500 font-light font-sans mt-0.5">Self-Kitchen Friendly</p>
-          </div>
-          <div className="border-l md:border-l border-slate-200">
-            <p className="text-2xl md:text-3xl font-black text-blue-600 font-mono">4 Lang</p>
-            <p className="text-xs md:text-sm text-gray-500 font-light font-sans mt-0.5">Bengali, Hindi, Malayalam assistance</p>
-          </div>
-        </div>
-      </section>
 
-      {/* Facilities tailored specifically for medical patients */}
-      <section id="features-section" className="py-16 md:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs font-mono font-bold text-blue-600 bg-blue-100/50 px-2.5 py-1 rounded-full uppercase tracking-widest">
-            Humble Amenities
-          </span>
-          <h3 className="text-3xl font-extrabold font-sans text-slate-900 mt-3 leading-tight">
-            Designed for Accompanying Relatives & Peace of Mind
-          </h3>
-          <p className="text-gray-500 text-sm mt-2 font-light leading-relaxed">
-            We understand the challenges of medical travels. Our guesthouse facilities are designed by families, specifically focusing on food health, translation comfort, and safe recovery.
-          </p>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100 hover:shadow-xl transition-shadow group">
-            <div className="bg-emerald-50 text-emerald-700 p-3 rounded-xl inline-block group-hover:bg-emerald-500 group-hover:text-white transition duration-200 mb-4">
-              <Utensils className="w-6 h-6" />
-            </div>
-            <h4 className="text-lg font-bold text-slate-900">Self-Cooking Kitchen access</h4>
-            <p className="text-gray-500 font-light text-sm mt-2 leading-relaxed">
-              Equipped with high-quality induction stoves, individual storage bins, clean utensils, and purified RO drinking water to cook custom home dietary food for recovering patients.
-            </p>
-          </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100 hover:shadow-xl transition-shadow group">
-            <div className="bg-blue-50 text-blue-600 p-3 rounded-xl inline-block group-hover:bg-blue-600 group-hover:text-white transition duration-200 mb-4">
-              <Languages className="w-6 h-6" />
-            </div>
-            <h4 className="text-lg font-bold text-slate-900">Bengali & Hindi Help Desk</h4>
-            <p className="text-gray-500 font-light text-sm mt-2 leading-relaxed">
-              Don't worry about local Tamil barriers. Our friendly coordination staff speaks fluent Bengali, Hindi, Malayalam, and English to help organize groceries or hospital token steps.
-            </p>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100 hover:shadow-xl transition-shadow group">
-            <div className="bg-indigo-50 text-indigo-700 p-3 rounded-xl inline-block group-hover:bg-indigo-500 group-hover:text-white transition duration-200 mb-4">
-              <ShieldCheck className="w-6 h-6" />
-            </div>
-            <h4 className="text-lg font-bold text-slate-900">Strict Medical Hygiene</h4>
-            <p className="text-gray-500 font-light text-sm mt-2 leading-relaxed">
-              Regular deep sanitization and hospital-grade disinfections are conducted between check-ins. Blackout drapes and premium noise-insulation panels protect recovery rest.
-            </p>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100 hover:shadow-xl transition-shadow group">
-            <div className="bg-blue-50 text-blue-700 p-3 rounded-xl inline-block group-hover:bg-blue-500 group-hover:text-white transition duration-200 mb-4">
-              <HeartPulse className="w-6 h-6" />
-            </div>
-            <h4 className="text-lg font-bold text-slate-900">Special Needs Support</h4>
-            <p className="text-gray-500 font-light text-sm mt-2 leading-relaxed">
-              Easy elevator lift access to all upper room floors, specific wheelchair ramps, wide door frames, and customized toilet setups with recovery-hold grab bars on demand.
-            </p>
-          </div>
-        </div>
-      </section>
 
       {/* Guest Rooms & Rates Catalog */}
       <section id="rooms-section" className="py-16 bg-slate-100 border-t border-b border-slate-205 border-slate-200">
@@ -798,93 +702,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
         </div>
       </section>
 
-      {/* Travel logistics transfers */}
-      <section id="travel-section" className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-5 space-y-6">
-            <span className="text-xs font-mono font-bold text-blue-600 bg-blue-100/50 px-2.5 py-1 rounded-full uppercase tracking-widest">
-              Safe Patient Transit Info
-            </span>
-            <h3 className="text-3xl font-extrabold font-sans text-slate-900 leading-tight">
-              Pre-Booked Airport & Katpadi Station Cabs
-            </h3>
-            <p className="text-gray-500 text-sm font-light leading-relaxed">
-              Arriving late at night with patient wheel-chairs or vulnerable kids is highly stressful. We provide highly courteous guesthouse drivers with pre-agreed fixed quotes. No surprise pricing, no passenger bargaining.
-            </p>
 
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="bg-emerald-50 border border-emerald-100 p-2 rounded-xl text-emerald-800 shrink-0">
-                  <CheckCircle2 className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-slate-900 text-sm">Pre-Flight Flight Monitoring</h4>
-                  <p className="text-xs text-gray-500 font-light mt-0.5 leading-relaxed">
-                    Our drivers monitor flight landings in Chennai/Bangalore in real-time. Simply walk out to the arrivals gate to find your driver holding a custom name card.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="bg-emerald-50 border border-emerald-100 p-2 rounded-xl text-emerald-800 shrink-0">
-                  <CheckCircle2 className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-slate-900 text-sm">Hygienic Clean Air Cabs</h4>
-                  <p className="text-xs text-gray-500 font-light mt-0.5 leading-relaxed">
-                    Sedans are deep cleaned before pickups. Accommodates standard wheelchairs, walking support aids, and heavy oxygen canisters effortlessly.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-blue-50/20 border border-slate-200 rounded-xl p-5 flex items-center gap-4 text-slate-900">
-              <div>
-                <p className="text-xs font-mono font-bold uppercase text-blue-600">Support 24/7 Helpline</p>
-                <p className="text-base font-bold mt-1 text-slate-900">WhatsApp / Call Logistics Support</p>
-                <p className="text-xs font-semibold text-blue-600 mt-0.5">+91 95000 88771</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="lg:col-span-7 bg-white rounded-2xl p-6 md:p-8 shadow-xl border border-gray-100">
-            <h4 className="text-lg font-bold text-slate-900 mb-4 font-sans tracking-tight">Active Fixed Tariff Rates</h4>
-            <div className="space-y-4">
-              {travels.map((travel) => (
-                <div
-                  key={travel.id}
-                  className="p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:border-slate-200 transition duration-150 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-slate-900 text-sm md:text-base">{travel.serviceName}</span>
-                      <span className="bg-blue-50 text-blue-620 text-blue-600 font-mono text-[10px] px-2 py-0.5 rounded-full font-bold">
-                        {travel.coverage}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-500 font-light leading-relaxed max-w-md">{travel.description}</p>
-                    <p className="text-[11px] font-mono text-gray-400">Representative: {travel.driverName || 'Verified Crew'}</p>
-                  </div>
-
-                  <div className="text-left sm:text-right shrink-0">
-                    <span className="text-lg font-black text-slate-900 font-mono block">
-                      ₹{travel.fixedRate > 0 ? travel.fixedRate : `${travel.ratePerKm}/km`}
-                    </span>
-                    <span className="text-xs text-gray-400 font-light">All tolls included</span>
-                    
-                    <button
-                      onClick={() => handleBookingStart('Non-AC Single Room')}
-                      className="mt-2 block w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-3 py-1.5 rounded-lg transition"
-                    >
-                      Book Driver
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Map Direction Guide */}
       <section className="bg-slate-100 py-16 border-t border-b border-slate-150">
@@ -905,50 +723,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section id="testimonials-section" className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs font-mono font-bold text-blue-600 bg-blue-100/50 px-2.5 py-1 rounded-full uppercase tracking-widest font-semibold">
-            Patient Stories
-          </span>
-          <h3 className="text-3xl font-extrabold font-sans text-slate-900 mt-3 leading-tight">
-            Loved by Recovery Families
-          </h3>
-          <p className="text-gray-500 text-sm mt-2 font-light leading-relaxed">
-            See the honest experiences shared by family members and attendants who stayed with us during their treatment phases in Christian Medical College.
-          </p>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {testimonials.map((test) => (
-            <div
-              key={test.id}
-              className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 flex flex-col justify-between hover:shadow-lg transition-all duration-200"
-            >
-              <div>
-                <div className="flex gap-1 text-emerald-500 mb-3">
-                  {[...Array(test.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-emerald-500" />
-                  ))}
-                </div>
-                <p className="text-gray-600 text-sm italic font-light leading-relaxed">
-                  "{test.text}"
-                </p>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center text-xs font-mono">
-                <div>
-                  <p className="font-bold text-slate-900">{test.author}</p>
-                  <p className="text-gray-400 font-light mt-0.5">{test.relation}</p>
-                </div>
-                <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-bold uppercase tracking-wider text-[10px]">
-                  {test.state}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
 
       {/* FAQs */}
       <section id="faq-section" className="py-16 bg-slate-100 border-t border-b border-slate-200">
@@ -1016,119 +791,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
         </div>
       </section>
 
-      {/* Inquiry and Contact Footer Sections */}
-      <section id="contact-section" className="py-16 bg-slate-900 text-white relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 relative z-10">
-          
-          <div className="lg:col-span-12 lg:col-span-5 space-y-6 col-span-1">
-            <span className="bg-blue-500/20 text-blue-400 text-xs px-2.5 py-1 rounded-full font-mono uppercase font-semibold">
-              Get in touch
-            </span>
-            <h3 className="text-3xl font-extrabold tracking-tight font-sans text-white">
-              Have customized treatment lodging concerns?
-            </h3>
-            <p className="text-slate-300 font-light text-sm leading-relaxed">
-              Fill in your questions. Whether you require specific ground-floor toilet configurations, long-term monthly discount rates, or language guide assistance, our warm support team will respond quickly.
-            </p>
 
-            <div className="space-y-4 pt-4 border-t border-slate-800 text-sm text-slate-200 font-light">
-              <div className="flex gap-3">
-                <MapPin className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
-                <span>Babu Rao Street Lane, Near CMC Jubilee Gate Bus Stop, Vellore, Tamil Nadu, 632004</span>
-              </div>
-              <div className="flex gap-3">
-                <Phone className="w-5 h-5 text-blue-400 shrink-0" />
-                <span>Landline desk: 0416 - 2234005 | WhatsApp: +91 94441 55662</span>
-              </div>
-              <div className="flex gap-3">
-                <Globe className="w-5 h-5 text-blue-400 shrink-0" />
-                <span>English, Bengali, Malayalam Desk Coordinator</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="lg:col-span-7 bg-white text-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl col-span-1">
-            <h4 className="text-xl font-bold text-slate-900 mb-3 font-sans tracking-tight">Send Instant Inquiry Desk</h4>
-            <p className="text-gray-500 text-xs font-light mb-6">Submitted questions immediately register under our active Operations Panel for review and scheduling.</p>
-
-            {contactSuccess && (
-              <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-xl text-sm font-semibold flex gap-2 items-center mb-6 animate-scale-up">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-                <span>Your query has been recorded successfully. Our desk coordinators will get back to you shortly!</span>
-              </div>
-            )}
-
-            <form onSubmit={handleContactSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">Your Full Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={senderName}
-                    onChange={(e) => setSenderName(e.target.value)}
-                    placeholder="e.g. Mrs. Debolina Sen"
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 text-gray-900"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">Mobile/WhatsApp No *</label>
-                  <input
-                    type="tel"
-                    required
-                    value={senderPhone}
-                    onChange={(e) => setSenderPhone(e.target.value)}
-                    placeholder="e.g. +91 94330 99001"
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 text-gray-900"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Email (Optional)</label>
-                <input
-                  type="email"
-                  value={senderEmail}
-                  onChange={(e) => setSenderEmail(e.target.value)}
-                  placeholder="e.g. debolina@gmail.com"
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 text-gray-900"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Query Subject (Optional)</label>
-                <input
-                  type="text"
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  placeholder="e.g. Looking for wheelchair ground floor room prices"
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 text-gray-900"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Detailed Message *</label>
-                <textarea
-                  required
-                  rows={3}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Describe your patient situation, treatment duration or airport cab timing..."
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 text-gray-900"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition duration-200 text-sm shadow-md flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <Send className="w-4 h-4 text-emerald-300" />
-                Submit Inquiries
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
 
       {/* Footer Branding Bar */}
       <footer className="bg-slate-950 text-slate-400 py-8 border-t border-slate-800 text-xs text-center z-10 relative">
