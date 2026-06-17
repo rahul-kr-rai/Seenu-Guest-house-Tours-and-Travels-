@@ -211,100 +211,141 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
       </header>
 
       {/* Redesigned Premium Hero Section with Split-interactive design */}
-      <section className="relative overflow-hidden pt-12 pb-20 lg:pt-16 lg:pb-28 bg-gradient-to-br from-slate-50 via-blue-50/20 to-white">
+      <section className="relative overflow-hidden pt-0 pb-20 lg:pb-28 bg-gradient-to-br from-slate-50 via-blue-50/20 to-white">
         {/* Subtle decorative mesh background and glowing active elements */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-b from-blue-300/10 to-indigo-300/5 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-10 left-10 w-[300px] h-[300px] bg-emerald-400/5 rounded-full blur-2xl pointer-events-none" />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_80%,transparent_100%)] opacity-40 pointer-events-none" />
 
+        {/* Premium full-width background image banner touching the navbar with 0 gap */}
+        <div className="relative w-full h-[380px] sm:h-[450px] overflow-hidden bg-slate-950 mb-12 border-b border-slate-200">
+          <div 
+            className="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-105"
+            style={{ backgroundImage: `url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80')` }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/60 to-slate-900/20" />
+          
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full relative z-10 flex flex-col justify-end pb-8 sm:pb-12 text-left">
+            {/* Floating Distance Badge inside the banner */}
+            <div className="inline-flex items-center gap-2 bg-blue-600 text-white px-3.5 py-1.5 rounded-full text-[10px] font-black font-mono tracking-wider uppercase w-fit mb-4 shadow-md border border-blue-400/20">
+              <MapPin className="w-3.5 h-3.5 animate-pulse" />
+              180m Flat Walk to CMC Scudder Gate 1
+            </div>
+
+            {/* Banner Content */}
+            <div className="space-y-4 max-w-2xl">
+              <h2 className="text-2xl sm:text-3xl md:text-4.5xl lg:text-5xl font-black font-sans tracking-tight text-white leading-tight drop-shadow-md">
+                Your Peaceful Recovery Haven <br className="hidden sm:inline"/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300 font-extrabold">
+                  With Premium Patient Care
+                </span>
+              </h2>
+              
+              <p className="text-slate-200 text-xs sm:text-sm md:text-base leading-relaxed font-light drop-shadow-sm max-w-xl">
+                Seenu Guest House delivers spotless, noise-insulated lodging accommodations optimized specifically for patients & relatives visiting Christian Medical College (CMC) Vellore. Relax with pristine home-style cooking access, 24/7 pure RO water, bilingual translation, and seamless railway transit.
+              </p>
+
+              <div className="flex flex-wrap gap-3 pt-2">
+                <button 
+                  onClick={() => scrollToSection('rooms-section')}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-extrabold px-6 py-3.5 rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-lg shadow-blue-500/25 border border-blue-400/25 hover:scale-[1.02] active:scale-[0.98] duration-200"
+                >
+                  Book Now
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+                <a 
+                  href="https://wa.me/919444155662" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="bg-slate-900/80 hover:bg-slate-900 text-white text-xs sm:text-sm font-semibold px-6 py-3.5 rounded-xl transition cursor-pointer flex items-center justify-center gap-2 shadow-md border border-slate-800 backdrop-blur-xs"
+                >
+                  <MessageCircle className="w-4 h-4 text-emerald-400" />
+                  Contact Desk WhatsApp
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
             
             {/* Left Column: Bold Typographic & Core Features Panel */}
-            <div className="lg:col-span-6 space-y-6 md:space-y-8 text-left lg:pt-4">
-              
-              {/* Distance announcement label */}
-              <div className="inline-flex items-center gap-2.5 bg-blue-50 border border-blue-150 px-3.5 py-1.5 rounded-full shadow-xs">
-                <span className="flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-blue-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
-                </span>
-                <span className="text-[11px] font-bold font-mono text-blue-700 tracking-wider uppercase">
-                  180m Flat Walk to CMC Scudder Gate 1
-                </span>
-              </div>
+            <div className="lg:col-span-6 space-y-8 text-left">
 
-              {/* Title & Introduction */}
-              <div className="space-y-4">
-                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-black font-sans tracking-tight text-slate-900 leading-tight">
-                  Premium Patient Stay & <br/>
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-600">
-                    Multilingual Logistics
-                  </span>
-                </h2>
-                <p className="text-slate-600 text-sm sm:text-base md:text-lg leading-relaxed font-light max-w-xl">
-                  We render spotless, noise-insulated lodgings tailored purposefully for recovering patients and accompanying relatives visiting Christian Medical College (CMC) Vellore. Relax with access to custom meal self-cooking kitchens, 24/7 airport dispatch desks, and fluent Bengali/Hindi support coordinators.
-                </p>
-              </div>
-
-              {/* Key Trust Badges inline layout */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex gap-3 bg-white border border-slate-100 p-3.5 rounded-2xl shadow-xs">
-                  <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl h-fit">
-                    <Utensils className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-800">Dietary Kitchens</h4>
-                    <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">Induction stoves & pure RO water for user meals.</p>
-                  </div>
+              {/* Amenities Card: Top 6 Amenities organized in 2-column rows inside an elegant card */}
+              <div className="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-lg shadow-slate-100/40 space-y-5">
+                <div className="border-b border-slate-100 pb-3">
+                  <h4 className="text-[10px] uppercase font-black text-slate-400 tracking-widest font-mono">Premium On-Site Integrity</h4>
+                  <p className="text-sm font-black text-slate-800 mt-0.5">Top Patient & Relative Conveniences</p>
                 </div>
+                
+                <div className="grid grid-cols-2 gap-x-6 gap-y-5">
+                  {/* Row 1 / Col 1: Dietary Kitchen */}
+                  <div className="flex gap-2.5">
+                    <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl h-fit shrink-0">
+                      <Utensils className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h5 className="text-[11px] font-bold text-slate-800 uppercase tracking-tight">Dietary Kitchen</h5>
+                      <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">Gas stoves, cookware, and full utensils for customized healing diets.</p>
+                    </div>
+                  </div>
 
-                <div className="flex gap-3 bg-white border border-slate-100 p-3.5 rounded-2xl shadow-xs">
-                  <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl h-fit">
-                    <Languages className="w-4 h-4" />
+                  {/* Row 1 / Col 2: Multilingual Help */}
+                  <div className="flex gap-2.5">
+                    <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl h-fit shrink-0">
+                      <Languages className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h5 className="text-[11px] font-bold text-slate-800 uppercase tracking-tight">Caring Assistance</h5>
+                      <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">Native ground translators fluent in Bengali, Hindi, & English.</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-800">Assistance Desk</h4>
-                    <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">Speak fluent Bengali, Hindi, and Malayalam natively.</p>
-                  </div>
-                </div>
 
-                <div className="flex gap-3 bg-white border border-slate-100 p-3.5 rounded-2xl shadow-xs">
-                  <div className="p-2 bg-blue-50 text-blue-600 rounded-xl h-fit">
-                    <ShieldCheck className="w-4 h-4" />
+                  {/* Row 2 / Col 1: Hygiene */}
+                  <div className="flex gap-2.5">
+                    <div className="p-2 bg-blue-50 text-blue-600 rounded-xl h-fit shrink-0">
+                      <ShieldCheck className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h5 className="text-[11px] font-bold text-slate-800 uppercase tracking-tight">Clinical Hygiene</h5>
+                      <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">Rigorous multi-point sanitization and deep clean before check-in.</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-800">Sanitized Rooms</h4>
-                    <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">Deep sanitization before every check-in.</p>
-                  </div>
-                </div>
 
-                <div className="flex gap-3 bg-white border border-slate-100 p-3.5 rounded-2xl shadow-xs">
-                  <div className="p-2 bg-amber-50 text-amber-600 rounded-xl h-fit">
-                    <Award className="w-4 h-4" />
+                  {/* Row 2 / Col 2: Pure RO Drinking Water */}
+                  <div className="flex gap-2.5">
+                    <div className="p-2 bg-sky-50 text-sky-600 rounded-xl h-fit shrink-0">
+                      <CheckCircle2 className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h5 className="text-[11px] font-bold text-slate-800 uppercase tracking-tight">RO Pure Water</h5>
+                      <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">Safe reverse-osmosis mineral-drinking water tape open 24/7.</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-800">Top Rated</h4>
-                    <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">4.9/5 patient satisfaction over 140+ bookings.</p>
-                  </div>
-                </div>
-              </div>
 
-              {/* Direct helpline buttons instead of standalone text */}
-              <div className="flex flex-wrap items-center gap-4 pt-2">
-                <button 
-                  onClick={() => scrollToSection('rooms-section')}
-                  className="bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold px-5 py-3 rounded-xl transition cursor-pointer flex items-center gap-1.5"
-                >
-                  Browse Room Gallery
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-                <div className="flex items-center gap-2 text-xs font-mono">
-                  <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span className="text-slate-500">Helpline WhatsApp:</span>
-                  <a href="https://wa.me/919444155662" target="_blank" rel="noopener noreferrer" className="font-extrabold text-slate-800 hover:text-blue-600 hover:underline">
-                    +91 94441 55662
-                  </a>
+                  {/* Row 3 / Col 1: Distance to Gate */}
+                  <div className="flex gap-2.5">
+                    <div className="p-2 bg-amber-50 text-amber-600 rounded-xl h-fit shrink-0">
+                      <MapPin className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h5 className="text-[11px] font-bold text-slate-800 uppercase tracking-tight">Direct CMC Walk</h5>
+                      <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">Only 180 meters short, flat walk to the CMC Scudder Gate 1.</p>
+                    </div>
+                  </div>
+
+                  {/* Row 3 / Col 2: Transit Assistant */}
+                  <div className="flex gap-2.5">
+                    <div className="p-2 bg-rose-50 text-rose-600 rounded-xl h-fit shrink-0">
+                      <Car className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h5 className="text-[11px] font-bold text-slate-800 uppercase tracking-tight">Transit Support</h5>
+                      <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">Direct 24/7 airport and railway shuttle coordination desk.</p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
