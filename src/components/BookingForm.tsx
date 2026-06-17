@@ -85,7 +85,7 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
       if (lowercaseMsg.includes('confirm') || lowercaseMsg.includes('✓')) {
         replyText = `✅ *STATUS UPDATED TO CONFIRMED*\n\nThank you, *${guestName}*! Your confirmation reply has been registered in our reservation cloud.\n\nOur property manager will expect your arrival on check-in date *${checkInDate}*. Travel safe!`;
       } else if (lowercaseMsg.includes('question') || lowercaseMsg.includes('help') || lowercaseMsg.includes('how')) {
-        replyText = `👨‍💼 *HELP DESK AGENT ASSIGNED*\n\nHello, a customer support executive is reviewing your request. For immediate assistance with CMC Hospital entries or route layout, you can also text us directly on our official WhatsApp: *+91 93602 11223*.`;
+        replyText = `👨‍💼 *HELP DESK AGENT ASSIGNED*\n\nHello, a customer support executive is reviewing your request. For immediate assistance with CMC Hospital entries or route layout, you can also text us directly on our official WhatsApp: *+91 95002 92806*.`;
       } else if (lowercaseMsg.includes('bed') || lowercaseMsg.includes('pillow') || lowercaseMsg.includes('extra') || lowercaseMsg.includes('request')) {
         replyText = `🛏️ *SPECIAL REQUEST REGISTERED*\n\nWe have automatically appended: _"${text}"_ to your reservation notes!\n\nOur front-desk team will prepare the room amenities accordingly before your QR check-in scan.`;
       } else {
@@ -227,7 +227,7 @@ and Patient UHID Card.
 
       // Redirect to WhatsApp with encoded parameters to bypass database latency
       const encodedText = encodeURIComponent(whatsappText);
-      const computedUrl = `https://wa.me/919360211223?text=${encodedText}`;
+      const computedUrl = `https://wa.me/919500292806?text=${encodedText}`;
       
       setGeneratedTicket(whatsappText);
       setWhatsappUrl(computedUrl);

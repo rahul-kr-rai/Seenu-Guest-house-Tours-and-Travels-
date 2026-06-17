@@ -8,6 +8,7 @@ import { dbService } from '../services/dataService';
 import { GuestRoom, TravelService, Testimonial } from '../types';
 import InteractiveMap from './InteractiveMap';
 import BookingForm from './BookingForm';
+import RoomDetailsModal from './RoomDetailsModal';
 import { 
   Building2, Utensils, Languages, ShieldCheck, 
   Tv, Wifi, Flame, HeartPulse, ChevronRight,
@@ -32,6 +33,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
   // Room comparison states
   const [selectedComparisonRooms, setSelectedComparisonRooms] = useState<string[]>([]);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
+  const [selectedRoomForDetails, setSelectedRoomForDetails] = useState<GuestRoom | null>(null);
 
   // Guest QR Check-In Redirection Handler States
   const [scannedBookingId, setScannedBookingId] = useState<string | null>(null);
@@ -354,7 +356,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
                   <ChevronRight className="w-4 h-4" />
                 </button>
                 <a 
-                  href="https://wa.me/919444155662?text=Hello%20Seenu%20Guest%20House%2C%20I%20would%20like%20to%20inquire%20about%20booking%20a%20peaceful%20room%20near%20CMC%20Vellore.%20Please%20let%20me%20know%20the%20availability%20and%20pricing%20details.%20Thank%20you!" 
+                  href="https://wa.me/919500292806?text=Hello%20Seenu%20Guest%20House%2C%20I%20would%20like%20to%20inquire%20about%20booking%20a%20peaceful%20room%20near%20CMC%20Vellore.%20Please%20let%20me%20know%20the%20availability%20and%20pricing%20details.%20Thank%20you!" 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="bg-slate-900/80 hover:bg-slate-900 text-white text-xs sm:text-sm font-semibold px-6 py-3.5 rounded-xl transition cursor-pointer flex items-center justify-center gap-2 shadow-md border border-slate-800 backdrop-blur-xs"
@@ -652,7 +654,8 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
                 return (
                   <div 
                     key={room.id}
-                    className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 flex flex-col hover:shadow-xl transition duration-300 relative"
+                    onClick={() => setSelectedRoomForDetails(room)}
+                    className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 flex flex-col hover:shadow-xl transition duration-300 relative cursor-pointer group hover:border-blue-200"
                   >
                     {/* Status Badge */}
                     <div className="absolute top-4 left-4 z-10 flex gap-2">
@@ -667,8 +670,11 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
                     </div>
 
                     {/* Compare Checkbox */}
-                    <div className="absolute top-4 right-4 z-10">
-                      <label className="flex items-center gap-1.5 bg-white/95 backdrop-blur-md px-2.5 py-1.5 rounded-full shadow-md text-[11px] font-extrabold text-slate-800 cursor-pointer border border-slate-205 border-slate-200 select-none hover:bg-slate-50 transition active:scale-95 duration-150">
+                    <div 
+                      className="absolute top-4 right-4 z-10"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <label className="flex items-center gap-1.5 bg-white/95 backdrop-blur-md px-2.5 py-1.5 rounded-full shadow-md text-[11px] font-extrabold text-slate-800 cursor-pointer border border-slate-200 select-none hover:bg-slate-50 transition active:scale-95 duration-150">
                         <input 
                           type="checkbox"
                           checked={selectedComparisonRooms.includes(room.id)}
@@ -679,7 +685,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
                       </label>
                     </div>
 
-                    <div className="aspect-[16/10] bg-gray-100 relative group overflow-hidden">
+                    <div className="aspect-[16/10] bg-gray-100 relative overflow-hidden">
                       <img 
                         src={room.imgUrl} 
                         alt={room.category}
@@ -693,7 +699,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
 
                     <div className="p-6 flex-1 flex flex-col justify-between">
                       <div>
-                        <h4 className="text-xl font-bold text-slate-900 font-sans tracking-tight flex items-center justify-between">
+                        <h4 className="text-xl font-bold text-slate-900 font-sans tracking-tight flex items-center justify-between group-hover:text-blue-600 transition duration-150">
                           <span>{room.category}</span>
                           <span className="text-xs font-mono text-gray-400">Room {room.roomNumber}</span>
                         </h4>
@@ -709,7 +715,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
 
                         {/* List of Amenities */}
                         <div className="mt-4 pt-4 border-t border-gray-100">
-                          <p className="text-xs font-mono text-gray-400 uppercase tracking-widest font-semibold mb-2">Room Amenities Included</p>
+                          <p className="text-xs font-mono text-gray-400 uppercase tracking-widest font-semibold mb-2 font-mono">Room Amenities Included</p>
                           <div className="grid grid-cols-2 gap-y-1.5 text-xs text-gray-600 font-light">
                             {room.amenities.slice(0, 4).map((amen, idx) => (
                               <div key={idx} className="flex items-center gap-1">
@@ -728,15 +734,14 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
 
                       <div className="mt-6 pt-4">
                         <button
-                          onClick={() => handleBookingStart(room.category)}
                           disabled={isUnderMaintenance}
-                          className={`w-full py-2.5 rounded-xl text-center font-semibold text-sm transition tracking-tight flex items-center justify-center gap-1.5 ${
+                          className={`w-full py-2.5 rounded-xl text-center font-bold text-sm transition tracking-tight flex items-center justify-center gap-1.5 ${
                             isUnderMaintenance 
                               ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                              : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs cursor-pointer'
+                              : 'bg-blue-600 group-hover:bg-blue-700 text-white shadow-xs cursor-pointer'
                           }`}
                         >
-                          {isUnderMaintenance ? 'Under Deep Sanitization' : 'Request Quick Room Check'}
+                          {isUnderMaintenance ? 'Under Deep Sanitization' : 'Book Now'}
                         </button>
                       </div>
                     </div>
@@ -933,11 +938,11 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
                 </li>
                 <li className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-slate-500 shrink-0" />
-                  <span>Call Desk: +91 94330 99001</span>
+                  <span>Call Desk: <a href="tel:+919500292806" className="hover:text-blue-500 hover:underline font-semibold transition duration-150">+91 95002 92806</a></span>
                 </li>
                 <li className="flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-slate-500 shrink-0" />
-                  <span>WhatsApp Logistics: <a href="https://wa.me/919500088771?text=Hello%20Seenu%20Guest%20House%2C%20I%20have%20a%20query%20regarding%20airport%20or%20railway%20station%20transfers%20or%20local%20travel%20logistics.%20Please%20guide%20me.%20Thank%20you!" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 hover:underline font-semibold transition duration-150">+91 95000 88771</a></span>
+                  <span>WhatsApp Logistics: <a href="https://wa.me/919500292806?text=Hello%20Seenu%20Guest%20House%2C%20I%20have%20a%20query%20regarding%20airport%20or%20railway%20station%20transfers%20or%20local%20travel%20logistics.%20Please%20guide%20me.%20Thank%20you!" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 hover:underline font-semibold transition duration-150">+91 95002 92806</a></span>
                 </li>
               </ul>
             </div>
@@ -993,6 +998,18 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
           </div>
         </div>
       </footer>
+
+      {/* Room Details walkthrough Modal */}
+      {selectedRoomForDetails && (
+        <RoomDetailsModal
+          room={selectedRoomForDetails}
+          onClose={() => setSelectedRoomForDetails(null)}
+          onBookNow={(category) => {
+            setSelectedRoomForDetails(null);
+            handleBookingStart(category);
+          }}
+        />
+      )}
 
       {/* Booking Form modal overlay */}
       {isBookingOpen && (
@@ -1290,7 +1307,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
                     onClick={() => {
                       setIsConfirmingWA(true);
                       const messageStr = `🏨 *SEENU GUEST HOUSE - PASSENGER CHECK-IN VERIFIED* 🔑\n\nHello Seenu Desk,\nI have successfully scanned my QR code at the reception desk to check in!\n\n📋 *My Checked-In Details:*\n▪️ Booking ID: *${scannedBookingData.id}*\n▪️ Guest Name: *${scannedBookingData.guestName}*\n▪️ Category: *${scannedBookingData.roomCategory}*\n▪️ Assigned Room: *Room ${scannedRoomNo}*\n▪️ Dates: *${scannedBookingData.checkInDate} to ${scannedBookingData.checkOutDate}*\n▪️ Fare Total: *₹${scannedBookingData.totalAmount}*\n\nPlease confirm key handover. Thank you!`;
-                      const waUrl = `https://wa.me/919360211223?text=${encodeURIComponent(messageStr)}`;
+                      const waUrl = `https://wa.me/919500292806?text=${encodeURIComponent(messageStr)}`;
                       
                       setTimeout(() => {
                         setIsConfirmingWA(false);
