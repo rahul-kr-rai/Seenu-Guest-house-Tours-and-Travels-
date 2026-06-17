@@ -354,7 +354,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
                   <ChevronRight className="w-4 h-4" />
                 </button>
                 <a 
-                  href="https://wa.me/919444155662" 
+                  href="https://wa.me/919444155662?text=Hello%20Seenu%20Guest%20House%2C%20I%20would%20like%20to%20inquire%20about%20booking%20a%20peaceful%20room%20near%20CMC%20Vellore.%20Please%20let%20me%20know%20the%20availability%20and%20pricing%20details.%20Thank%20you!" 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="bg-slate-900/80 hover:bg-slate-900 text-white text-xs sm:text-sm font-semibold px-6 py-3.5 rounded-xl transition cursor-pointer flex items-center justify-center gap-2 shadow-md border border-slate-800 backdrop-blur-xs"
@@ -937,7 +937,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
                 </li>
                 <li className="flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-slate-500 shrink-0" />
-                  <span>WhatsApp Logistics: +91 95000 88771</span>
+                  <span>WhatsApp Logistics: <a href="https://wa.me/919500088771?text=Hello%20Seenu%20Guest%20House%2C%20I%20have%20a%20query%20regarding%20airport%20or%20railway%20station%20transfers%20or%20local%20travel%20logistics.%20Please%20guide%20me.%20Thank%20you!" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 hover:underline font-semibold transition duration-150">+91 95000 88771</a></span>
                 </li>
               </ul>
             </div>
