@@ -22,16 +22,16 @@ export default function InteractiveMap() {
   const routes: RouteOption[] = [
     {
       id: 'walking-cmc',
-      label: 'Walking to CMC Main Gate',
+      label: 'Walking to CMC Jubilee Gate Bus Stop',
       icon: <Compass className="w-5 h-5 text-blue-600" />,
-      distance: '180 meters',
-      duration: '2-3 mins walk',
-      desc: 'Superb, flat straight walking path from our guesthouse alley to CMC Entrance Gate 1 (Scudder Road). Highly convenient for medical rehabilitation visits.',
+      distance: '350 meters',
+      duration: '4-5 mins walk',
+      desc: 'Superb, flat straight walking path from our guesthouse alley to CMC Jubilee Gate Bus Stop. Highly convenient for medical rehabilitation visits.',
       points: [
         'Exit guesthouse gate, turn left onto Babu Rao Street (Quiet Residential Alley)',
-        'Walk 80 meters past Sri Murugan Provision Store',
-        'Turn right at the Scudder Road junction',
-        'CMC Hospital main entrance gate & OPD registration is right across the street'
+        'Walk 250 meters past Sri Murugan Provision Store',
+        'Turn right at the Jubilee Gate intersection',
+        'CMC Jubilee Gate Bus Stop & hospital registration desk is conveniently reachable right across the street'
       ]
     },
     {
@@ -44,7 +44,7 @@ export default function InteractiveMap() {
       points: [
         'Take Katpadi Main Rd towards Vellore City center',
         'Cross the Palar River Bridge',
-        'Pass the Vellore Old Bus Stand, proceed toward Babu Rao Street near Scudder Road',
+        'Pass the Vellore Old Bus Stand, proceed toward Babu Rao Street near CMC Jubilee Gate',
         'Our guesthouse is tucked safely in the quiet lane away from honking traffic'
       ]
     },
@@ -72,7 +72,7 @@ export default function InteractiveMap() {
       points: [
         'Head toward Hosur via Bengaluru Electronic City flyover',
         'Pass Krishnagiri and Ambur (famous for Biryani lunch stops!)',
-        'Take the Vellore Central exit toward Scudder Road',
+        'Take the Vellore Central exit toward CMC Jubilee Gate Bus Stop',
         'Safe arrivals under custom medical assist monitoring'
       ]
     }
@@ -96,7 +96,7 @@ export default function InteractiveMap() {
           </div>
           <h3 className="text-2xl font-bold font-sans tracking-tight">Walking Closeness to CMC Hospital</h3>
           <p className="text-slate-300 text-sm mt-1">
-            Located in Babu Rao Street alley—peacefully insulated from noisy hospital traffic, yet just a 2-minute stroll to OPD.
+            Located in Babu Rao Street alley—peacefully insulated from noisy hospital traffic, yet just a 4-minute stroll to OPD.
           </p>
         </div>
         <button

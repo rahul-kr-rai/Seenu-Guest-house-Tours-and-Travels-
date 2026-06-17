@@ -49,7 +49,7 @@ const DEFAULT_ROOMS: GuestRoom[] = [
     beds: '1 Double Bed',
     amenities: ['Double Attached Washroom', 'Private Breezy Balcony', 'Free Pot', 'Common Refrigerator', 'Common Kitchen Access', 'Tap Water (Free)'],
     status: 'Available',
-    description: 'Breezy double room featuring a spacious private balcony. Located near Ida Scudder Road with wonderful road ventilation.',
+    description: 'Breezy double room featuring a spacious private balcony. Located near CMC Jubilee Gate with wonderful road ventilation.',
     imgUrl: 'https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&w=600&q=80'
   },
   {

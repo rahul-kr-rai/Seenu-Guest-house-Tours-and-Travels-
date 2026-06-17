@@ -28,6 +28,32 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
   const [selectedRoomCat, setSelectedRoomCat] = useState('Non-AC Single Room');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Room comparison states
+  const [selectedComparisonRooms, setSelectedComparisonRooms] = useState<string[]>([]);
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
+
+  const handleToggleCompare = (roomId: string) => {
+    setSelectedComparisonRooms(prev => {
+      const isSelected = prev.includes(roomId);
+      let next: string[];
+      if (isSelected) {
+        next = prev.filter(id => id !== roomId);
+      } else {
+        if (prev.length >= 2) {
+          next = [prev[1], roomId];
+        } else {
+          next = [...prev, roomId];
+        }
+      }
+      
+      // Auto open modal when 2 rooms are selected
+      if (next.length === 2 && !isSelected) {
+        setTimeout(() => setIsCompareModalOpen(true), 250);
+      }
+      return next;
+    });
+  };
+
   // Hero interactive stay planner states
   const [heroRoomCat, setHeroRoomCat] = useState('Non-AC Single Room');
   const [heroDays, setHeroDays] = useState(5);
@@ -229,7 +255,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
             {/* Floating Distance Badge inside the banner */}
             <div className="inline-flex items-center gap-2 bg-blue-600 text-white px-3.5 py-1.5 rounded-full text-[10px] font-black font-mono tracking-wider uppercase w-fit mb-4 shadow-md border border-blue-400/20">
               <MapPin className="w-3.5 h-3.5 animate-pulse" />
-              180m Flat Walk to CMC Scudder Gate 1
+              350m Flat Walk to CMC Jubilee Gate Bus Stop
             </div>
 
             {/* Banner Content */}
@@ -332,7 +358,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
                     </div>
                     <div>
                       <h5 className="text-[11px] font-bold text-slate-800 uppercase tracking-tight">Direct CMC Walk</h5>
-                      <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">Only 180 meters short, flat walk to the CMC Scudder Gate 1.</p>
+                      <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">Only 350 meters short, flat walk to the CMC Jubilee Gate Bus Stop.</p>
                     </div>
                   </div>
 
@@ -525,8 +551,8 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
       <section className="bg-slate-50 border-y border-slate-200 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div>
-            <p className="text-2xl md:text-3xl font-black text-blue-600 font-mono">180m</p>
-            <p className="text-xs md:text-sm text-gray-500 font-light font-sans mt-0.5">Walk to CMC Gate 1</p>
+            <p className="text-2xl md:text-3xl font-black text-blue-600 font-mono">350m</p>
+            <p className="text-xs md:text-sm text-gray-500 font-light font-sans mt-0.5">Walk to CMC Jubilee Gate Bus Stop</p>
           </div>
           <div className="border-l border-slate-200">
             <p className="text-2xl md:text-3xl font-black text-blue-600 font-mono">24/7</p>
@@ -636,6 +662,19 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
                       }`}>
                         ● {room.status}
                       </span>
+                    </div>
+
+                    {/* Compare Checkbox */}
+                    <div className="absolute top-4 right-4 z-10">
+                      <label className="flex items-center gap-1.5 bg-white/95 backdrop-blur-md px-2.5 py-1.5 rounded-full shadow-md text-[11px] font-extrabold text-slate-800 cursor-pointer border border-slate-205 border-slate-200 select-none hover:bg-slate-50 transition active:scale-95 duration-150">
+                        <input 
+                          type="checkbox"
+                          checked={selectedComparisonRooms.includes(room.id)}
+                          onChange={() => handleToggleCompare(room.id)}
+                          className="rounded text-blue-600 focus:ring-blue-500 w-3.5 h-3.5 cursor-pointer accent-blue-600"
+                        />
+                        <span>Compare</span>
+                      </label>
                     </div>
 
                     <div className="aspect-[16/10] bg-gray-100 relative group overflow-hidden">
@@ -806,7 +845,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
               Hospital Transit & Street Access Guide
             </h3>
             <p className="text-gray-500 text-sm mt-2 font-light leading-relaxed">
-              We have compiled detailed walking guidelines so patient attendants do not get lost in Scudder Road traffic. Look up the directional tracker details below.
+              We have compiled detailed walking guidelines so patient attendants do not get lost in Jubilee Gate traffic. Look up the directional tracker details below.
             </p>
           </div>
           
@@ -885,10 +924,10 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
               <h4 className="font-bold text-slate-900 text-sm md:text-base flex items-center gap-2">
                 <HelpCircle className="w-5 h-5 text-blue-600 shrink-0" />
-                How far is CMC Gate 1?
+                How far is CMC Jubilee Gate Bus Stop?
               </h4>
               <p className="text-gray-650 text-gray-600 font-light text-sm mt-2 leading-relaxed pl-7">
-                We are exactly 180 meters away in Babu Rao Street. It is a completely flat road with no steep climbs or busy flyover crossings, taking less than 3 minutes to walk for a general adult. Highly suitable for patients with mild walking barriers.
+                We are exactly 350 meters away in Babu Rao Street. It is a completely flat road with no steep climbs or busy flyover crossings, taking less than 5 minutes to walk for a general adult. Highly suitable for patients with mild walking barriers.
               </p>
             </div>
 
@@ -943,7 +982,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
             <div className="space-y-4 pt-4 border-t border-slate-800 text-sm text-slate-200 font-light">
               <div className="flex gap-3">
                 <MapPin className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
-                <span>Babu Rao Street Lane, Near Scudder Road Scudder Circle, Vellore, Tamil Nadu, 632004</span>
+                <span>Babu Rao Street Lane, Near CMC Jubilee Gate Bus Stop, Vellore, Tamil Nadu, 632004</span>
               </div>
               <div className="flex gap-3">
                 <Phone className="w-5 h-5 text-blue-400 shrink-0" />
@@ -1046,7 +1085,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
             © {new Date().getFullYear()} Seenu Guest House, Tour's and Travels. All hospital assistance, pickup logs, room statuses, and schedules managed securely in real-time.
           </p>
           <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4 text-slate-500">
-            <span>Walking distance to Christian Medical College (CMC), Vellore | Near Gate 1</span>
+            <span>Walking distance to Christian Medical College (CMC), Vellore | Near Jubilee Gate Bus Stop</span>
             <span className="hidden sm:inline">•</span>
             <button 
               onClick={onOpenAdmin} 
@@ -1069,6 +1108,208 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
           selectedCategory={selectedRoomCat}
         />
       )}
+
+      {/* Floating Comparison Tray */}
+      {selectedComparisonRooms.length > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-xl bg-slate-900/95 backdrop-blur-md text-white px-5 py-4 rounded-2xl shadow-2xl border border-slate-800 flex items-center justify-between gap-4 animate-slide-up">
+          <div className="flex flex-col">
+            <span className="text-xs uppercase tracking-widest font-mono text-blue-400 font-extrabold">Room Comparison</span>
+            <span className="text-xs sm:text-sm font-semibold mt-0.5">
+              {selectedComparisonRooms.length === 1 
+                ? '1 room selected (Choose 1 more)' 
+                : '2 rooms selected! Ready to compare'}
+            </span>
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <button 
+              onClick={() => setSelectedComparisonRooms([])}
+              className="text-slate-400 hover:text-white text-xs font-semibold px-2 py-1 transition cursor-pointer"
+            >
+              Clear
+            </button>
+            <button 
+              onClick={() => setIsCompareModalOpen(true)}
+              disabled={selectedComparisonRooms.length < 2}
+              className={`px-4 py-2.5 rounded-xl font-bold text-xs transition uppercase tracking-wider cursor-pointer ${
+                selectedComparisonRooms.length === 2 
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25 border border-blue-400/20' 
+                  : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700/50'
+              }`}
+            >
+              Compare
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Side-by-Side Comparison Modal */}
+      {isCompareModalOpen && rooms.filter(r => selectedComparisonRooms.includes(r.id)).length === 2 && (() => {
+        const comparedRoomsList = rooms.filter(r => selectedComparisonRooms.includes(r.id));
+        const unionAmenitiesList = Array.from(
+          new Set(comparedRoomsList.flatMap(r => r.amenities))
+        );
+        return (
+          <div className="fixed inset-0 z-[60] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+            <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] overflow-hidden flex flex-col shadow-2xl border border-slate-100 animate-scale-up">
+              {/* Header */}
+              <div className="px-5 py-4 sm:px-6 sm:py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
+                <div>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 font-sans tracking-tight">Side-by-Side Room Comparison</h3>
+                  <p className="text-[11px] sm:text-xs text-slate-500 font-light mt-0.5">Compare pricing, config, and amenities to select the perfect room</p>
+                </div>
+                <button 
+                  onClick={() => setIsCompareModalOpen(false)}
+                  className="p-1.5 hover:bg-slate-200/60 rounded-full text-slate-400 hover:text-slate-700 transition cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5 sm:space-y-6">
+                <div className="grid grid-cols-3 gap-3 sm:gap-4 items-stretch border-b border-slate-100 pb-5">
+                  {/* Column 1: Feature label */}
+                  <div className="hidden sm:flex items-center text-slate-400 text-[10px] uppercase tracking-wider font-mono font-bold">
+                    Overview Tiers
+                  </div>
+                  <div className="sm:hidden flex items-center text-slate-400 text-[9px] uppercase tracking-wider font-mono font-bold">
+                    Rooms
+                  </div>
+                  {/* Column 2: Room 1 Card */}
+                  <div className="space-y-2">
+                    <div className="aspect-[16/10] rounded-xl overflow-hidden bg-slate-100 border border-slate-200/65">
+                      <img src={comparedRoomsList[0].imgUrl} alt={comparedRoomsList[0].category} className="w-full h-full object-cover" />
+                    </div>
+                    <h4 className="font-extrabold text-slate-950 text-xs sm:text-sm leading-tight line-clamp-1">{comparedRoomsList[0].category}</h4>
+                    <p className="text-[10px] text-slate-400 font-mono">Room {comparedRoomsList[0].roomNumber}</p>
+                  </div>
+                  {/* Column 3: Room 2 Card */}
+                  <div className="space-y-2">
+                    <div className="aspect-[16/10] rounded-xl overflow-hidden bg-slate-100 border border-slate-200/65">
+                      <img src={comparedRoomsList[1].imgUrl} alt={comparedRoomsList[1].category} className="w-full h-full object-cover" />
+                    </div>
+                    <h4 className="font-extrabold text-slate-950 text-xs sm:text-sm leading-tight line-clamp-1">{comparedRoomsList[1].category}</h4>
+                    <p className="text-[10px] text-slate-400 font-mono">Room {comparedRoomsList[1].roomNumber}</p>
+                  </div>
+                </div>
+
+                {/* Specs Table */}
+                <div className="space-y-2.5">
+                  <h4 className="text-[10px] sm:text-xs font-mono font-black text-blue-600 bg-blue-50 px-2.5 py-1 rounded w-fit uppercase tracking-widest">
+                    Core Specifications
+                  </h4>
+                  <div className="border border-slate-200/60 rounded-2xl overflow-hidden divide-y divide-slate-100 bg-slate-50/50">
+                    {/* Daily Rate Row */}
+                    <div className="grid grid-cols-3 p-3 items-center">
+                      <span className="text-[11px] sm:text-xs font-bold text-slate-600">Price Per Day</span>
+                      <span className="text-xs sm:text-sm font-black text-blue-600 font-mono">₹{comparedRoomsList[0].pricePerDay}</span>
+                      <span className="text-xs sm:text-sm font-black text-blue-600 font-mono">₹{comparedRoomsList[1].pricePerDay}</span>
+                    </div>
+                    {/* Beds Row */}
+                    <div className="grid grid-cols-3 p-3 items-center">
+                      <span className="text-[11px] sm:text-xs font-bold text-slate-600">Beds</span>
+                      <span className="text-xs text-slate-800 font-mono truncate">{comparedRoomsList[0].beds}</span>
+                      <span className="text-xs text-slate-800 font-mono truncate">{comparedRoomsList[1].beds}</span>
+                    </div>
+                    {/* Capacity Row */}
+                    <div className="grid grid-cols-3 p-3 items-center">
+                      <span className="text-[11px] sm:text-xs font-bold text-slate-600">Capacity</span>
+                      <span className="text-xs text-slate-800 font-mono truncate">Max {comparedRoomsList[0].capacity} guests</span>
+                      <span className="text-xs text-slate-800 font-mono truncate">Max {comparedRoomsList[1].capacity} guests</span>
+                    </div>
+                    {/* Availability Row */}
+                    <div className="grid grid-cols-3 p-3 items-center">
+                      <span className="text-[11px] sm:text-xs font-bold text-slate-600">Status</span>
+                      <span className="text-xs font-bold text-slate-800 font-mono flex items-center gap-1">
+                        <span className={`h-2.5 w-2.5 rounded-full ${comparedRoomsList[0].status === 'Available' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                        {comparedRoomsList[0].status}
+                      </span>
+                      <span className="text-xs font-bold text-slate-800 font-mono flex items-center gap-1">
+                        <span className={`h-2.5 w-2.5 rounded-full ${comparedRoomsList[1].status === 'Available' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                        {comparedRoomsList[1].status}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Amenities Comparison */}
+                <div className="space-y-2.5">
+                  <h4 className="text-[10px] sm:text-xs font-mono font-black text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded w-fit uppercase tracking-widest">
+                    Amenities Comparison Matrix
+                  </h4>
+                  <div className="border border-slate-200/60 rounded-2xl overflow-hidden divide-y divide-slate-100 bg-white">
+                    {unionAmenitiesList.map((amenity, idx) => {
+                      const hasR1 = comparedRoomsList[0].amenities.includes(amenity);
+                      const hasR2 = comparedRoomsList[1].amenities.includes(amenity);
+                      return (
+                        <div key={idx} className="grid grid-cols-3 p-2.5 sm:p-3 items-center hover:bg-slate-50/55 duration-100">
+                          <span className="text-[11px] sm:text-xs font-medium text-slate-700 font-sans line-clamp-1">{amenity}</span>
+                          <span className="text-xs">
+                            {hasR1 ? (
+                              <span className="inline-flex items-center gap-1 text-emerald-600 font-extrabold">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" /> Yes
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-slate-300 font-medium">
+                                <X className="w-3.5 h-3.5 shrink-0" /> No
+                              </span>
+                            )}
+                          </span>
+                          <span className="text-xs">
+                            {hasR2 ? (
+                              <span className="inline-flex items-center gap-1 text-emerald-600 font-extrabold">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" /> Yes
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-slate-300 font-medium">
+                                <X className="w-3.5 h-3.5 shrink-0" /> No
+                              </span>
+                            )}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer actions */}
+              <div className="p-4 sm:p-5 border-t border-slate-100 bg-slate-50 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+                <button
+                  onClick={() => {
+                    setSelectedComparisonRooms([]);
+                    setIsCompareModalOpen(false);
+                  }}
+                  className="px-4 py-2.5 text-slate-500 hover:text-slate-850 text-xs font-semibold uppercase tracking-wider text-center cursor-pointer transition border border-transparent rounded-xl"
+                >
+                  Clear Selections
+                </button>
+                
+                <div className="flex gap-2.5">
+                  <button
+                    onClick={() => {
+                      handleBookingStart(comparedRoomsList[0].category);
+                      setIsCompareModalOpen(false);
+                    }}
+                    className="flex-1 sm:flex-none px-4 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-md cursor-pointer"
+                  >
+                    Book Room {comparedRoomsList[0].roomNumber}
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleBookingStart(comparedRoomsList[1].category);
+                      setIsCompareModalOpen(false);
+                    }}
+                    className="flex-1 sm:flex-none px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-md cursor-pointer"
+                  >
+                    Book Room {comparedRoomsList[1].roomNumber}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Floating real-time WhatsApp action button */}
       <a 
