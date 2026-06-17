@@ -152,8 +152,8 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
     loadAllData();
   };
 
-  const handleSimulateScan = (bookingId: string) => {
-    if (!bookingId) return;
+  const handleSimulateScan = (inputPayload: string) => {
+    if (!inputPayload) return;
     setIsScanningActive(true);
     setScannerErrorMessage('');
     setScannerSuccessMessage('');
@@ -162,6 +162,18 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
     
     // Simulate high-speed camera decoders
     setTimeout(() => {
+      let bookingId = inputPayload.trim();
+      if (bookingId.includes('?checkin=')) {
+        try {
+          const parts = bookingId.split('?checkin=');
+          if (parts.length > 1) {
+            bookingId = parts[1].split('&')[0];
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
       const match = dbService.getBookings().find(b => b.id === bookingId);
       setIsScanningActive(false);
       if (match) {
@@ -171,7 +183,7 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
           setScannerSelectedRoom(match.assignedRoomId);
         }
       } else {
-        setScannerErrorMessage('Decoder Error: QR payload signature does not match any register in database.');
+        setScannerErrorMessage(`Decoder Error: Scanned data ("${bookingId}") does not match any register in database.`);
       }
     }, 1200);
   };
@@ -1296,7 +1308,7 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
 
                                 <button
                                   onClick={() => {
-                                    const qrPayload = `SEENU GUEST HOUSE RESERVATION\nID: ${bk.id}\nGuest: ${bk.guestName}\nRoom: ${bk.roomCategory}\nStay: ${bk.checkInDate} to ${bk.checkOutDate}\nTotal: ₹${bk.totalAmount}\nStatus: ${bk.status}`;
+                                    const qrPayload = `${window.location.origin}/?checkin=${bk.id}`;
                                     QRCode.toDataURL(qrPayload, { margin: 2 })
                                       .then(url => {
                                         setViewingQrBookingId(bk.id);

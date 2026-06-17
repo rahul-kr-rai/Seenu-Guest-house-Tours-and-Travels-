@@ -13,7 +13,8 @@ import {
   Tv, Wifi, Flame, HeartPulse, ChevronRight,
   Phone, Globe, CheckCircle2, Star, Send, 
   HelpCircle, MessageSquare, ClipboardCheck, ArrowRight, MapPin,
-  MessageCircle, Menu, X, Calculator, Plus, Minus, Car, Award
+  MessageCircle, Menu, X, Calculator, Plus, Minus, Car, Award,
+  QrCode, Calendar, ClipboardList
 } from 'lucide-react';
 
 interface UserAppProps {
@@ -31,6 +32,14 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
   // Room comparison states
   const [selectedComparisonRooms, setSelectedComparisonRooms] = useState<string[]>([]);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
+
+  // Guest QR Check-In Redirection Handler States
+  const [scannedBookingId, setScannedBookingId] = useState<string | null>(null);
+  const [scannedBookingData, setScannedBookingData] = useState<any | null>(null);
+  const [showCheckInSuccessModal, setShowCheckInSuccessModal] = useState(false);
+  const [whatsAppCheckInConfirmed, setWhatsAppCheckInConfirmed] = useState(false);
+  const [scannedRoomNo, setScannedRoomNo] = useState<string>('TBD');
+  const [isConfirmingWA, setIsConfirmingWA] = useState(false);
 
   const handleToggleCompare = (roomId: string) => {
     setSelectedComparisonRooms(prev => {
@@ -71,6 +80,49 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
     setRooms(dbService.getRooms());
     setTravels(dbService.getTravelServices());
     setTestimonials(dbService.getTestimonials());
+
+    // Process check-in QR scan landing
+    const params = new URLSearchParams(window.location.search);
+    const checkinId = params.get('checkin');
+    if (checkinId) {
+      const allBookings = dbService.getBookings();
+      const found = allBookings.find(b => b.id === checkinId);
+      if (found) {
+        setScannedBookingId(checkinId);
+        
+        // Auto assign a room if none is assigned as of now
+        let assignedRoom = found.assignedRoomId;
+        if (!assignedRoom) {
+          const availRooms = dbService.getRooms().filter(r => r.category === found.roomCategory && r.status === 'Available');
+          if (availRooms.length > 0) {
+            assignedRoom = availRooms[0].id;
+          } else {
+            assignedRoom = 'room-101'; // Fallback
+          }
+        }
+        
+        // Determine room number representation
+        const roomObj = dbService.getRooms().find(r => r.id === assignedRoom);
+        const roomNumText = roomObj ? roomObj.roomNumber : '101';
+        setScannedRoomNo(roomNumText);
+
+        // Advance reservation status safely to CheckedIn
+        dbService.updateBookingStatus(checkinId, 'CheckedIn', assignedRoom);
+        
+        // Load the finalized updated record
+        const refreshed = dbService.getBookings().find(b => b.id === checkinId);
+        setScannedBookingData(refreshed || found);
+        setShowCheckInSuccessModal(true);
+
+        // Sanitize search parameters silently to maintain pristine browsing state
+        try {
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    }
   }, []);
 
   const handleBookingStart = (category: string) => {
@@ -1311,9 +1363,125 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
         );
       })()}
 
+      {/* Dynamic Digital Check-In Verification Success Modal */}
+      {showCheckInSuccessModal && scannedBookingData && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm animate-fade-in text-left">
+          <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl max-w-md w-full space-y-5 shadow-2xl relative text-center">
+            <button
+              onClick={() => setShowCheckInSuccessModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="mx-auto w-14 h-14 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-full flex items-center justify-center animate-bounce">
+              <CheckCircle2 className="w-8 h-8" />
+            </div>
+
+            <div>
+              <h3 className="text-white font-extrabold text-lg sm:text-xl">Check-In Successfully Verified!</h3>
+              <p className="text-xs text-slate-400 mt-1">Thank you for choosing Seenu Guest House. Your digital key register is activated.</p>
+            </div>
+
+            {/* Receipt Summary details pane in mono format */}
+            <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 text-left space-y-2 font-mono text-xs text-slate-300">
+              <div className="flex justify-between border-b border-slate-800 pb-1.5">
+                <span className="text-slate-500 font-bold uppercase text-[10px]">RESERVATION ID:</span>
+                <span className="text-emerald-400 font-bold">{scannedBookingData.id}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500 font-bold uppercase text-[10px]">GUEST NAME:</span>
+                <span className="text-slate-200">{scannedBookingData.guestName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500 font-bold uppercase text-[10px]">CONTACT NO:</span>
+                <span className="text-slate-200">{scannedBookingData.guestPhone}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500 font-semibold uppercase text-[10px]">ROOM CATEGORY:</span>
+                <span className="text-indigo-300">{scannedBookingData.roomCategory}</span>
+              </div>
+              <div className="flex justify-between bg-emerald-950 border-y border-emerald-555/10 py-1.5 px-1 my-1">
+                <span className="text-emerald-500 font-black uppercase text-[10px]">ASSIGNED ROOM:</span>
+                <span className="text-emerald-400 font-black">ROOM #{scannedRoomNo}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500 font-bold uppercase text-[10px]">STAY PERIOD:</span>
+                <span className="text-slate-200">{scannedBookingData.checkInDate} to {scannedBookingData.checkOutDate}</span>
+              </div>
+              <div className="flex justify-between font-bold">
+                <span className="text-slate-500 font-bold uppercase text-[10px]">ESTIMATED FARE:</span>
+                <span className="text-slate-100">₹{scannedBookingData.totalAmount}</span>
+              </div>
+              <div className="flex justify-between items-center bg-slate-900/50 p-1.5 rounded border border-slate-800">
+                <span className="text-[10px] text-slate-500 font-bold">CURRENT STATUS:</span>
+                <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Checked In ✅</span>
+              </div>
+            </div>
+
+            {/* Simulated Live Action Status */}
+            <div className="text-left bg-[#efeae2]/10 border border-slate-800 rounded-xl p-3.5 space-y-2">
+              <div className="flex items-start gap-2 text-xs">
+                <div className="w-7 h-7 bg-emerald-600 rounded-full flex items-center justify-center text-white text-xs shrink-0 mt-0.5 font-bold">
+                  💬
+                </div>
+                <div className="flex-1 text-slate-300">
+                  <p className="font-bold text-[11px] text-emerald-400 flex items-center gap-1">
+                    WhatsApp Desk Auto-Confirm Receipt Agent
+                  </p>
+                  <p className="text-[10px] text-slate-400 leading-relaxed mt-0.5">
+                    Click confirm to instantly coordinate room key handover with Seenu Desk via physical WhatsApp chat.
+                  </p>
+                </div>
+              </div>
+
+              {whatsAppCheckInConfirmed ? (
+                <div className="bg-[#128c7e]/20 border border-emerald-500/20 text-emerald-400 p-2.5 rounded-lg text-xs font-bold text-center flex items-center justify-center gap-1.5">
+                  <span className="text-emerald-400">✓ Check-In Confirmed & WhatsApp chat opened!</span>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setIsConfirmingWA(true);
+                      const messageStr = `🏨 *SEENU GUEST HOUSE - PASSENGER CHECK-IN VERIFIED* 🔑\n\nHello Seenu Desk,\nI have successfully scanned my QR code at the reception desk to check in!\n\n📋 *My Checked-In Details:*\n▪️ Booking ID: *${scannedBookingData.id}*\n▪️ Guest Name: *${scannedBookingData.guestName}*\n▪️ Category: *${scannedBookingData.roomCategory}*\n▪️ Assigned Room: *Room ${scannedRoomNo}*\n▪️ Dates: *${scannedBookingData.checkInDate} to ${scannedBookingData.checkOutDate}*\n▪️ Fare Total: *₹${scannedBookingData.totalAmount}*\n\nPlease confirm key handover. Thank you!`;
+                      const waUrl = `https://wa.me/919360211223?text=${encodeURIComponent(messageStr)}`;
+                      
+                      setTimeout(() => {
+                        setIsConfirmingWA(false);
+                        setWhatsAppCheckInConfirmed(true);
+                        try {
+                          window.open(waUrl, '_blank');
+                        } catch (err) {
+                          console.error(err);
+                        }
+                      }, 800);
+                    }}
+                    disabled={isConfirmingWA}
+                    className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs py-2 px-3 rounded-lg transition shrink-0 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm shadow-emerald-600/10 disabled:opacity-50"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5 text-white" />
+                    {isConfirmingWA ? 'Opening WhatsApp...' : 'Confirm Check-In via WhatsApp'}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-2.5">
+              <button
+                onClick={() => setShowCheckInSuccessModal(false)}
+                className="w-full bg-slate-800 hover:bg-slate-705 border border-slate-700 hover:border-slate-700 text-white font-bold text-xs py-2.5 rounded-xl transition cursor-pointer"
+              >
+                Close & View Home
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Floating real-time WhatsApp action button */}
       <a 
-        href="https://wa.me/919360211223?text=Hello%20Seenu%20Guest%20House%2C%20I%20am%20inquiring%20about%20room%20availability%20and%20travel%20assistance."
+        href="https://wa.me/919360211223?text=Hello%20Seenu%20Guest%20House%2C%20I%20am%20inquiring%2520about%2520room%2520availability%2520and%2520travel%2520assistance."
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-50 group flex items-center gap-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 p-3 sm:py-3.5 sm:px-4.5 rounded-full sm:rounded-2xl shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300"

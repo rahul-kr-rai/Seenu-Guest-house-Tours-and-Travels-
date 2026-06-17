@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { dbService } from '../services/dataService';
-import { Calendar, User, Phone, MapPin, ClipboardList, Plane, CheckCircle2, AlertCircle, Sparkles, HelpCircle, Copy, ExternalLink, QrCode } from 'lucide-react';
+import { Calendar, User, Phone, MapPin, ClipboardList, Plane, CheckCircle2, AlertCircle, Sparkles, HelpCircle, Copy, ExternalLink, QrCode, MessageCircle, Send } from 'lucide-react';
 import QRCode from 'qrcode';
 
 interface BookingFormProps {
@@ -37,6 +37,12 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
   const [copied, setCopied] = useState(false);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
 
+  // Simulated WhatsApp Notification & Chat Engine states
+  const [showMockWhatsAppNav, setShowMockWhatsAppNav] = useState(false);
+  const [simulatedChatHistory, setSimulatedChatHistory] = useState<Array<{sender: 'bot' | 'user', text: string, time: string}>>([]);
+  const [simulatedUserReply, setSimulatedUserReply] = useState('');
+  const [isAutoReplying, setIsAutoReplying] = useState(false);
+
   const roomCategories = [
     'Non-AC Single Room',
     'Non-AC Double Room',
@@ -58,6 +64,38 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
     'Uttar Pradesh',
     'Other State'
   ];
+
+  const handleSendSimulatedReply = (textToSend?: string) => {
+    const text = textToSend || simulatedUserReply;
+    if (!text.trim() || isAutoReplying) return;
+
+    const userTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const userMsg = { sender: 'user' as const, text: text, time: userTime };
+    
+    setSimulatedChatHistory(prev => [...prev, userMsg]);
+    setSimulatedUserReply('');
+    setIsAutoReplying(true);
+
+    // Simulate smart customer desk agent responding back dynamically in 1s
+    setTimeout(() => {
+      const assistantTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      let replyText = '';
+      const lowercaseMsg = text.toLowerCase();
+      
+      if (lowercaseMsg.includes('confirm') || lowercaseMsg.includes('✓')) {
+        replyText = `✅ *STATUS UPDATED TO CONFIRMED*\n\nThank you, *${guestName}*! Your confirmation reply has been registered in our reservation cloud.\n\nOur property manager will expect your arrival on check-in date *${checkInDate}*. Travel safe!`;
+      } else if (lowercaseMsg.includes('question') || lowercaseMsg.includes('help') || lowercaseMsg.includes('how')) {
+        replyText = `👨‍💼 *HELP DESK AGENT ASSIGNED*\n\nHello, a customer support executive is reviewing your request. For immediate assistance with CMC Hospital entries or route layout, you can also text us directly on our official WhatsApp: *+91 93602 11223*.`;
+      } else if (lowercaseMsg.includes('bed') || lowercaseMsg.includes('pillow') || lowercaseMsg.includes('extra') || lowercaseMsg.includes('request')) {
+        replyText = `🛏️ *SPECIAL REQUEST REGISTERED*\n\nWe have automatically appended: _"${text}"_ to your reservation notes!\n\nOur front-desk team will prepare the room amenities accordingly before your QR check-in scan.`;
+      } else {
+        replyText = `📩 *MESSAGE ACKNOWLEDGED*\n\nWe have received your message: _"${text}"_.\n\nOur desk agent at Seenu Guest House will coordinate with you via WhatsApp shortly to finalize ID verification!`;
+      }
+
+      setSimulatedChatHistory(prev => [...prev, { sender: 'bot' as const, text: replyText, time: assistantTime }]);
+      setIsAutoReplying(false);
+    }, 1000);
+  };
 
   const handleInstantSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,7 +151,7 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
       });
 
       // Generate a unique check-in QR Code payload
-      const qrPayload = `SEENU GUEST HOUSE RESERVATION\nID: ${newBooking.id}\nGuest: ${newBooking.guestName}\nRoom: ${newBooking.roomCategory}\nStay: ${newBooking.checkInDate} to ${newBooking.checkOutDate}\nTotal: ₹${calculatedAmt}\nStatus: PENDING CHECK-IN`;
+      const qrPayload = `${window.location.origin}/?checkin=${newBooking.id}`;
       QRCode.toDataURL(qrPayload, {
         margin: 2,
         color: {
@@ -194,6 +232,18 @@ and Patient UHID Card.
       setGeneratedTicket(whatsappText);
       setWhatsappUrl(computedUrl);
       setSubmitSuccess(true);
+
+      // Prepare simulated Chat History for the user to view in real-time within the web interface
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      setSimulatedChatHistory([
+        {
+          sender: 'bot',
+          text: `🔔 *BOOKING RECEIVED* 🏨\n\nDear *${guestName}*,\nWe have successfully received your booking request! Here is your reservation receipt.\n\n📋 *Reservation details:*\n▫️ Guest ID: *${newBooking.id}*\n▫️ Category: *${roomCategory}*\n▫️ Stay: *${checkInDate} to ${checkOutDate}*\n▫️ Estimated Fare: *₹${calculatedAmt}*\n▫️ Bed Status: *Provisioned (Awaiting Proofs)*\n\n🔑 *Next Action Needed:*\nPlease send us a photo of your Government ID Proof and Patient Medical card to secure key handover!`,
+          time: timeStr
+        }
+      ]);
+      setShowMockWhatsAppNav(true);
 
       // Attempt to immediately open WhatsApp tab (might be blocked by popup blocker, which is fine since we display the view!)
       try {
@@ -339,6 +389,125 @@ and Patient UHID Card.
                   </div>
                 </div>
               )}
+
+              {/* Simulated Live WhatsApp Desk Status Monitor */}
+              <div id="simulated-whatsapp-sandbox-desk" className="w-full mt-5 bg-[#efeae2]/90 border border-slate-200 rounded-2xl overflow-hidden shadow-md font-sans">
+                {/* Simulated Chat Window Header */}
+                <div className="bg-[#075e54] text-white px-4 py-3 flex items-center justify-between shadow-sm">
+                  <div className="flex items-center gap-2.5">
+                    <div className="relative">
+                      <div className="w-9 h-9 bg-emerald-600 rounded-full flex items-center justify-center text-white font-extrabold text-sm border border-emerald-500/50 shadow-inner">
+                        💬
+                      </div>
+                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 border-2 border-[#075e54] rounded-full animate-ping" />
+                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 border-2 border-[#075e54] rounded-full" />
+                    </div>
+                    <div className="text-left font-sans">
+                      <div className="flex items-center gap-1">
+                        <span className="font-bold text-xs sm:text-sm text-slate-50">Seenu Guest House (Official)</span>
+                        <div className="bg-emerald-500 p-0.5 rounded-full flex items-center justify-center w-3 h-3 text-[7px]" title="Auto-Respond Verification Verified">✓</div>
+                      </div>
+                      <span className="text-[10px] text-emerald-200 font-medium block">Verification Auto-Response Agent (Online)</span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] uppercase font-black tracking-wider bg-emerald-900/40 text-emerald-100 px-2 py-0.5 rounded border border-emerald-800/30">WhatsApp Service</span>
+                </div>
+
+                {/* Simulated Chat Feed */}
+                <div className="p-4 space-y-4 max-h-[290px] overflow-y-auto text-left relative flex flex-col justify-start">
+                  <span className="text-[9px] bg-sky-100 text-sky-805 font-bold px-3 py-1 rounded-full mx-auto select-none font-mono uppercase text-center">
+                    🔒 Messages are simulated end-to-end for verification demo
+                  </span>
+
+                  {simulatedChatHistory.map((chat, idx) => (
+                    <div
+                      key={idx}
+                      className={`max-w-[85%] rounded-2xl p-3 text-xs shadow-sm space-y-1 ${
+                        chat.sender === 'bot'
+                          ? 'bg-white text-slate-800 self-start rounded-tl-none border border-slate-100'
+                          : 'bg-[#dcf8c6] text-slate-850 self-end rounded-tr-none border border-emerald-200/50'
+                      }`}
+                    >
+                      <div className="whitespace-pre-wrap leading-relaxed select-text font-light text-slate-800">
+                        {chat.text}
+                      </div>
+                      <div className="flex items-center justify-end gap-1.5 text-[9px] text-slate-400 font-mono">
+                        <span>{chat.time}</span>
+                        {chat.sender === 'bot' && (
+                          <span className="text-blue-500 font-bold" title="Message Received">✓✓</span>
+                        )}
+                        {chat.sender === 'user' && (
+                          <span className="text-blue-500 font-bold">✓✓</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
+                  {isAutoReplying && (
+                    <div className="bg-white/90 border border-slate-200 text-slate-600 rounded-full px-4 py-1.5 text-[10px] w-fit self-start animate-pulse flex items-center gap-1 font-mono">
+                      <span className="w-1.5 h-1.5 bg-slate-450 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-1.5 h-1.5 bg-slate-450 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-1.5 h-1.5 bg-slate-450 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      <span className="text-[10px] text-slate-500 font-medium">Property Desk Representative typing...</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Pre-made quick responses bar */}
+                <div className="bg-white/80 border-t border-slate-200/60 px-3 py-2 flex flex-wrap gap-1.5 items-center">
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider font-mono mr-1">Quick Answer:</span>
+                  <button
+                    type="button"
+                    disabled={isAutoReplying}
+                    onClick={() => handleSendSimulatedReply("Confirm Details ✓")}
+                    className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/80 text-[10px] px-2.5 py-1 rounded-full cursor-pointer transition font-medium disabled:opacity-40"
+                  >
+                    Confirm Details ✓
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isAutoReplying}
+                    onClick={() => handleSendSimulatedReply("Is there a kitchen for patient meals? 🍳")}
+                    className="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 text-[10px] px-2.5 py-1 rounded-full cursor-pointer transition font-medium disabled:opacity-40"
+                  >
+                    Check Kitchen 🍳
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isAutoReplying}
+                    onClick={() => handleSendSimulatedReply("Request extra blankets/pillows 🛏️")}
+                    className="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/80 text-[10px] px-2.5 py-1 rounded-full cursor-pointer transition font-medium disabled:opacity-40"
+                  >
+                    Extra Pillows 🛏️
+                  </button>
+                </div>
+
+                {/* Chat Custom Input Form */}
+                <div className="bg-[#f0f0f0] px-3 py-2.5 border-t border-slate-200 flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={simulatedUserReply}
+                    onChange={(e) => setSimulatedUserReply(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleSendSimulatedReply();
+                      }
+                    }}
+                    placeholder="Type customized reply to Seenu Auto-Agent Desk..."
+                    disabled={isAutoReplying}
+                    className="flex-1 bg-white border border-slate-200 rounded-full px-3.5 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleSendSimulatedReply()}
+                    disabled={!simulatedUserReply.trim() || isAutoReplying}
+                    className="bg-[#128c7e] hover:bg-[#075e54] text-white p-2 rounded-full cursor-pointer transition disabled:bg-slate-300 disabled:text-slate-400 flex items-center justify-center shrink-0 w-8 h-8"
+                    title="Send Simulated Message"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
 
               {/* High-fidelity visual mockup of the ticket voucher itself */}
               <div className="w-full mt-4 text-left bg-slate-950 text-[#10b981] p-4 rounded-xl font-mono text-[11px] sm:text-xs overflow-x-auto whitespace-pre border border-slate-800 shadow-inner max-h-[280px]">
