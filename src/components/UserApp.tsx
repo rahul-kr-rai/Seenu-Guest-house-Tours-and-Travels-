@@ -812,21 +812,157 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
 
 
 
-      {/* Footer Branding Bar */}
-      <footer className="bg-slate-950 text-slate-400 py-8 border-t border-slate-800 text-xs text-center z-10 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
-          <p className="font-medium text-slate-300">
-            © {new Date().getFullYear()} Seenu Guest House, Tour's and Travels. All hospital assistance, pickup logs, room statuses, and schedules managed securely in real-time.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4 text-slate-500">
-            <span>Walking distance to Christian Medical College (CMC), Vellore | Near Jubilee Gate Bus Stop</span>
-            <span className="hidden sm:inline">•</span>
-            <button 
-              onClick={onOpenAdmin} 
-              className="text-blue-400 hover:text-blue-300 underline cursor-pointer font-mono font-semibold"
-            >
-              Manager Office Login &rarr;
-            </button>
+      {/* Footer Branding Bar with Full Corporate, Location, and Patient Assistance Columns */}
+      <footer className="bg-slate-950 text-slate-400 pt-16 pb-12 border-t border-slate-800 text-xs z-10 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 pb-12 border-b border-slate-800">
+            {/* Column 1: Brand & Compassionate Philosophy */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="bg-blue-600 text-white rounded-lg p-1.5 font-bold tracking-tight text-sm font-sans">SGH</span>
+                <span className="font-extrabold text-white text-base font-sans tracking-tight">Seenu Guest House</span>
+              </div>
+              <p className="text-slate-400 font-light leading-relaxed">
+                A highly trusted, quiet patient lodging service situated just 350 meters from the Christian Medical College (CMC) Vellore Jubilee Gate. We specialize in providing sterile, peaceful, and fully comfortable accommodations for outstation families undergoing medical recovery.
+              </p>
+              <div className="pt-2 text-[11px] font-mono font-bold text-slate-500 uppercase tracking-wider">
+                Established for Medical Care Support
+              </div>
+            </div>
+
+            {/* Column 2: Easy Navigation & Resources */}
+            <div className="space-y-4">
+              <h4 className="text-white font-extrabold text-sm uppercase tracking-wider">Lodging Navigation</h4>
+              <ul className="space-y-2.5">
+                <li>
+                  <button 
+                    onClick={() => scrollToSection('rooms-section')} 
+                    className="hover:text-blue-400 transition flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <ArrowRight className="w-3.5 h-3.5 text-blue-500" />
+                    Rooms & Pricing Tiers
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => scrollToSection('interactive-map-section')} 
+                    className="hover:text-blue-400 transition flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <ArrowRight className="w-3.5 h-3.5 text-blue-500" />
+                    Distance & Location Guide
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => scrollToSection('faq-section')} 
+                    className="hover:text-blue-400 transition flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <ArrowRight className="w-3.5 h-3.5 text-blue-500" />
+                    Support & Amenities FAQs
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={onOpenAdmin} 
+                    className="hover:text-blue-400 transition flex items-center gap-1.5 cursor-pointer text-blue-400 font-medium"
+                  >
+                    <ArrowRight className="w-3.5 h-3.5 text-blue-400" />
+                    Manager Office Login
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 3: Patient Care Conveniences */}
+            <div className="space-y-4">
+              <h4 className="text-white font-extrabold text-sm uppercase tracking-wider">Patient Conveniences</h4>
+              <ul className="space-y-2.5 font-light">
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+                  Shared clean kitchen (Cook own diet food)
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+                  20L Clean Filter Water Cans (₹50)
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+                  Foldable physical wheelchair assistance
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+                  Pre-ordered railway/airport AC cabs
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 4: Contact Helpdesk & Location */}
+            <div className="space-y-4">
+              <h4 className="text-white font-extrabold text-sm uppercase tracking-wider">Contact & Address</h4>
+              <ul className="space-y-3 font-light text-slate-400 leading-relaxed">
+                <li className="flex items-start gap-2">
+                  <MapPin className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+                  <span>No. 12, Babu Rao Street Lane, near CMC Jubilee Gate, Vellore, Tamil Nadu, 632004</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-slate-500 shrink-0" />
+                  <span>Call Desk: +91 94330 99001</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-slate-500 shrink-0" />
+                  <span>WhatsApp Logistics: +91 95000 88771</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 font-light">
+            <div className="text-center md:text-left space-y-1">
+              <p className="font-medium text-slate-400">
+                © {new Date().getFullYear()} Seenu Guest House Town & Travels. All rights reserved.
+              </p>
+              <p className="text-[11px] text-slate-600">
+                All patient support programs, airport logistics transfers, booking records, and room keys are organized under dynamic admin supervision.
+              </p>
+            </div>
+            
+            {/* Accepted Payments Display */}
+            <div className="flex flex-col items-center md:items-end gap-2 shrink-0">
+              <span className="text-[10px] font-mono uppercase tracking-widest font-bold text-slate-600">Accepted Safe Payments</span>
+              <div className="flex flex-wrap gap-2 text-[10px] font-bold select-none justify-center md:justify-end">
+                {/* Google Pay logo badge */}
+                <span className="px-2 py-0.5 bg-white text-slate-900 border border-slate-200 rounded font-black tracking-tight text-[10px] shadow-xs flex items-center">
+                  <span className="text-[#4285F4]">G</span>
+                  <span className="text-[#EA4335]">o</span>
+                  <span className="text-[#FBBC05]">o</span>
+                  <span className="text-[#4285F4]">g</span>
+                  <span className="text-[#34A853]">l</span>
+                  <span className="text-[#EA4335]">e</span>
+                  <span className="text-slate-500 font-bold ml-0.5">Pay</span>
+                </span>
+                
+                {/* PhonePe logo badge */}
+                <span className="px-2.5 py-0.5 bg-[#5f259f] text-white rounded font-extrabold tracking-wide text-[10px] shadow-xs border border-[#551d91]">
+                  PhonePe
+                </span>
+                
+                {/* Paytm logo badge */}
+                <span className="px-2 py-0.5 bg-white text-slate-900 border border-slate-200 rounded font-black tracking-tighter text-[10px] shadow-xs flex items-center">
+                  <span className="text-[#00b9f5]">pay</span>
+                  <span className="text-[#002e6e]">tm</span>
+                </span>
+                
+                {/* UPI logo badge */}
+                <span className="px-2 py-0.5 bg-gradient-to-r from-[#005e3a] to-[#2e7d32] text-white rounded font-black tracking-widest text-[9px] shadow-xs italic border border-emerald-800">
+                  UPI
+                </span>
+
+                {/* Cash badge */}
+                <span className="px-2 py-0.5 bg-slate-900 border border-slate-800 text-emerald-400 rounded font-bold tracking-wider text-[9px] shadow-xs flex items-center gap-1">
+                  💵 CASH
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </footer>

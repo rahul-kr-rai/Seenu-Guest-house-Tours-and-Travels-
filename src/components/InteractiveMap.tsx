@@ -78,10 +78,16 @@ export default function InteractiveMap() {
     }
   ];
 
+  const mapEmbedUrls: Record<string, string> = {
+    'walking-cmc': 'https://maps.google.com/maps?q=Christian%20Medical%20College%20Vellore&t=&z=16&ie=UTF8&iwloc=&output=embed',
+    'rail-katpadi': 'https://maps.google.com/maps?q=Katpadi%20Junction%20Railway%20Station%20Vellore&t=&z=14&ie=UTF8&iwloc=&output=embed',
+    'chennai-airport': 'https://maps.google.com/maps?q=Chennai%20International%20Airport&t=&z=10&ie=UTF8&iwloc=&output=embed',
+    'bangalore-airport': 'https://maps.google.com/maps?q=Kempegowda%20International%20Airport%20Bengaluru&t=&z=10&ie=UTF8&iwloc=&output=embed'
+  };
+
   const selectedRoute = routes.find(r => r.id === activeRoute) || routes[0];
 
   const openInGoogleMaps = () => {
-    // Open exact coordinate or CMC Vellore general location
     window.open('https://www.google.com/maps/dir/?api=1&destination=Christian+Medical+College,+Vellore,+Tamil+Nadu+632004', '_blank');
   };
 
@@ -108,9 +114,9 @@ export default function InteractiveMap() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12">
+      <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[500px]">
         {/* Route Selectors */}
-        <div className="lg:col-span-5 border-r border-slate-100 bg-[#f8fafc] p-4 md:p-6 flex flex-col gap-2">
+        <div className="lg:col-span-4 border-r border-slate-100 bg-[#f8fafc] p-4 md:p-6 flex flex-col gap-2">
           <p className="text-xs font-mono text-slate-400 uppercase tracking-widest font-semibold mb-2 px-2">
             Select Travel Route
           </p>
@@ -118,24 +124,24 @@ export default function InteractiveMap() {
             <button
               key={route.id}
               onClick={() => setActiveRoute(route.id)}
-              className={`w-full flex items-start gap-4 p-4 rounded-xl transition text-left cursor-pointer border ${
+              className={`w-full flex items-start gap-3 p-3.5 rounded-xl transition text-left cursor-pointer border ${
                 activeRoute === route.id
                   ? 'bg-white border-blue-500 shadow-sm text-slate-900'
                   : 'bg-transparent border-transparent hover:bg-slate-100 text-slate-600'
               }`}
             >
-              <div className={`p-2.5 rounded-lg shrink-0 ${
+              <div className={`p-2 rounded-lg shrink-0 ${
                 activeRoute === route.id ? 'bg-blue-50' : 'bg-slate-100'
               }`}>
                 {route.icon}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-semibold text-sm md:text-base flex justify-between items-center pr-2">
-                  <span>{route.label}</span>
-                  {activeRoute === route.id && <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />}
+                <div className="font-semibold text-sm flex justify-between items-center pr-1 leading-snug">
+                  <span className="truncate">{route.label}</span>
+                  {activeRoute === route.id && <div className="w-1.5 h-1.5 bg-blue-600 rounded-full shrink-0 ml-1" />}
                 </div>
-                <div className="flex gap-3 text-xs mt-1 text-slate-500">
-                  <span className="font-mono bg-slate-100 px-1.5 py-0.5 rounded font-medium">{route.distance}</span>
+                <div className="flex gap-2 text-[11px] mt-0.5 text-slate-500">
+                  <span className="font-mono bg-slate-100 px-1 py-0.2 rounded font-medium">{route.distance}</span>
                   <span className="font-semibold text-blue-600">{route.duration}</span>
                 </div>
               </div>
@@ -143,30 +149,30 @@ export default function InteractiveMap() {
           ))}
         </div>
 
-        {/* Dynamic Route Info and Map Art */}
-        <div className="lg:col-span-7 p-6 md:p-8 flex flex-col justify-between bg-white">
+        {/* Dynamic Route Info */}
+        <div className="lg:col-span-4 p-5 md:p-6 flex flex-col justify-between bg-white border-r border-slate-100">
           <div>
             <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full mb-3 inline-block">
               Route Details: {selectedRoute.label}
             </span>
-            <div className="flex gap-4 items-baseline mt-2">
-              <span className="text-3xl font-bold font-sans text-slate-900">{selectedRoute.distance}</span>
-              <span className="text-sm font-medium text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">
+            <div className="flex gap-4 items-baseline mt-1">
+              <span className="text-2xl font-bold font-sans text-slate-900">{selectedRoute.distance}</span>
+              <span className="text-xs font-medium text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">
                 ⏱ {selectedRoute.duration}
               </span>
             </div>
-            <p className="text-slate-600 text-sm mt-3 leading-relaxed">
+            <p className="text-slate-600 text-xs mt-2 leading-relaxed">
               {selectedRoute.desc}
             </p>
 
-            <div className="mt-6 border-t border-slate-100 pt-6">
-              <h4 className="text-xs font-mono text-slate-400 uppercase tracking-wider font-semibold mb-3">
+            <div className="mt-4 border-t border-slate-100 pt-4">
+              <h4 className="text-xs font-mono text-slate-400 uppercase tracking-wider font-semibold mb-2">
                 Step-by-step guidance
               </h4>
-              <ul className="space-y-3">
+              <ul className="space-y-2">
                 {selectedRoute.points.map((pt, idx) => (
-                  <li key={idx} className="flex gap-3 text-sm text-slate-700 leading-relaxed font-light">
-                    <span className="w-5 h-5 bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center rounded-full text-xs font-bold shrink-0 mt-0.5 shadow-sm">
+                  <li key={idx} className="flex gap-2 text-xs text-slate-700 leading-relaxed font-light">
+                    <span className="w-4 h-4 bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center rounded-full text-[10px] font-bold shrink-0 mt-0.5 shadow-xs">
                       {idx + 1}
                     </span>
                     <span>{pt}</span>
@@ -176,16 +182,41 @@ export default function InteractiveMap() {
             </div>
           </div>
 
-          <div className="mt-8 bg-gradient-to-br from-[#f8fafc] to-[#f1f5f9] rounded-xl p-4 border border-slate-200 flex items-center gap-4">
-            <div className="bg-white p-2.5 rounded-full shadow-sm border border-slate-100 text-blue-600 shrink-0">
-              <MapPin className="w-5 h-5 animate-bounce" />
+          <div className="mt-4 bg-gradient-to-br from-[#f8fafc] to-[#f1f5f9] rounded-xl p-3 border border-slate-200/80 flex items-start gap-3">
+            <div className="bg-white p-2 rounded-full shadow-xs border border-slate-100 text-blue-600 shrink-0 mt-0.5 animate-bounce">
+              <MapPin className="w-4 h-4" />
             </div>
-            <div className="text-xs text-slate-800">
+            <div className="text-[11px] text-slate-800">
               <p className="font-semibold">Local Tip for Patients:</p>
-              <p className="text-slate-600 font-light mt-0.5 leading-relaxed">
-                Most outpatient queues open at 6:30 AM. Walking from our Guest House takes less than 3 minutes, giving you a quiet head start over outside visitors relying on autos.
+              <p className="text-slate-600 font-light mt-0.5 leading-normal">
+                Most outpatient queues open at 6:30 AM. Walking takes less than 3 minutes, giving you a quiet head start over outside visitors relying on autos.
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* Embedded Live Google Map */}
+        <div className="lg:col-span-4 p-4 bg-slate-50 flex flex-col h-full min-h-[350px] lg:min-h-0">
+          <div className="w-full flex-1 rounded-xl overflow-hidden shadow-inner border border-slate-200 bg-slate-200 relative">
+            <iframe
+              src={mapEmbedUrls[activeRoute]}
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen={true}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="absolute inset-0 w-full h-full"
+            ></iframe>
+          </div>
+          <div className="flex justify-between items-center mt-2.5 px-1 text-[10px] text-slate-400 font-mono">
+            <span>© Google Maps Live Feed</span>
+            <button 
+              onClick={openInGoogleMaps} 
+              className="text-blue-500 hover:underline flex items-center gap-1 cursor-pointer font-bold"
+            >
+              <Eye className="w-3 h-3" /> External View
+            </button>
           </div>
         </div>
       </div>
