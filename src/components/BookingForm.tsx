@@ -5,22 +5,29 @@
 
 import React, { useState } from 'react';
 import { dbService } from '../services/dataService';
-import { Calendar, User, Phone, MapPin, ClipboardList, Plane, CheckCircle2, AlertCircle, Sparkles, HelpCircle, Copy, ExternalLink, QrCode, MessageCircle, Send } from 'lucide-react';
+import { Calendar, User, Phone, MapPin, ClipboardList, Plane, CheckCircle2, AlertCircle, Sparkles, HelpCircle, Copy, ExternalLink, QrCode, MessageCircle, Send, CreditCard, Wallet, Banknote, X } from 'lucide-react';
 import QRCode from 'qrcode';
+import { GuestRoom } from '../types';
 
 interface BookingFormProps {
   onClose: () => void;
   onSuccess: () => void;
   selectedCategory?: string;
+  selectedRoom?: GuestRoom;
 }
 
-export default function BookingForm({ onClose, onSuccess, selectedCategory = 'Non-AC Single Room' }: BookingFormProps) {
+export default function BookingForm({ onClose, onSuccess, selectedCategory = 'Non-AC Single Room', selectedRoom }: BookingFormProps) {
+  const initialCategory = selectedRoom ? selectedRoom.category : selectedCategory;
   const [guestName, setGuestName] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
+  const [guestCountry, setGuestCountry] = useState('India');
   const [guestState, setGuestState] = useState('West Bengal');
   const [patientCardNo, setPatientCardNo] = useState('');
-  const [roomCategory, setRoomCategory] = useState(selectedCategory);
+  const [roomCategory, setRoomCategory] = useState(initialCategory);
+  const [roomTypeTab, setRoomTypeTab] = useState<'Non-AC' | 'AC'>(
+    initialCategory.toLowerCase().includes('ac') && !initialCategory.toLowerCase().includes('non-ac') ? 'AC' : 'Non-AC'
+  );
   const [checkInDate, setCheckInDate] = useState('');
   const [checkOutDate, setCheckOutDate] = useState('');
   const [needTravel, setNeedTravel] = useState(false);
@@ -28,6 +35,7 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
   const [pickupTime, setPickupTime] = useState('');
   const [flightTrainNo, setFlightTrainNo] = useState('');
   const [specialInstructions, setSpecialInstructions] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'Cash'>('UPI');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -50,19 +58,21 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
     'AC Double Room'
   ];
 
-  const StatesList = [
-    'West Bengal',
-    'Bangladesh (International)',
-    'Kerala',
-    'Karnataka',
-    'Assam',
-    'Tripura',
-    'Odisha',
-    'Andhra Pradesh',
-    'Bihar',
-    'Uttar Pradesh',
-    'Other State'
-  ];
+  const filteredCategories = roomCategories.filter(cat => {
+    const isAC = cat.toLowerCase().includes('ac') && !cat.toLowerCase().includes('non-ac');
+    return roomTypeTab === 'AC' ? isAC : !isAC;
+  });
+
+  const handleTabChange = (tab: 'Non-AC' | 'AC') => {
+    setRoomTypeTab(tab);
+    const firstMatchingCat = roomCategories.find(cat => {
+      const isAC = cat.toLowerCase().includes('ac') && !cat.toLowerCase().includes('non-ac');
+      return tab === 'AC' ? isAC : !isAC;
+    });
+    if (firstMatchingCat) {
+      setRoomCategory(firstMatchingCat);
+    }
+  };
 
   const handleSendSimulatedReply = (textToSend?: string) => {
     const text = textToSend || simulatedUserReply;
@@ -108,10 +118,14 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
     }
 
     try {
-      // Find room price
+      // Find room price and assignable room
       const rooms = dbService.getRooms();
-      const matchedCat = rooms.find(r => r.category === roomCategory);
-      const price = matchedCat ? matchedCat.pricePerDay : 300;
+      let targetRoom = selectedRoom;
+      if (!targetRoom) {
+        const roomsOfCat = rooms.filter(r => r.category === roomCategory);
+        targetRoom = roomsOfCat.find(r => r.status === 'Available') || roomsOfCat[0];
+      }
+      const price = targetRoom ? targetRoom.pricePerDay : 300;
 
       // Calculate total amount with discounts: 15+ days = 10% off, 30+ days = 20% off
       const t1 = new Date(checkInDate).getTime();
@@ -133,9 +147,11 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
         guestName,
         guestPhone,
         guestEmail,
-        guestState,
+        guestState: guestState ? `${guestState}, ${guestCountry}` : guestCountry,
+        guestCountry,
         patientCardNo,
         roomCategory,
+        assignedRoomId: targetRoom?.id,
         checkInDate,
         checkOutDate,
         status: 'Pending',
@@ -146,7 +162,8 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
           pickupTime,
           flightOrTrainNo: flightTrainNo
         } : undefined,
-        specialInstructions
+        specialInstructions,
+        paymentMethod
       });
 
       // Generate a unique check-in QR Code payload
@@ -200,6 +217,7 @@ export default function BookingForm({ onClose, onSuccess, selectedCategory = 'No
   • RATE:   ₹${price}/Day
   • LESS:   ${longStayDiscountTxt}
   ➔ TOTAL:  ₹${calculatedAmt}
+  ➔ PAY VIA: ${paymentMethod}
   ➔ STATUS: [ PENDING ]
 ────────────────────────────
 
@@ -261,9 +279,13 @@ and Patient UHID Card.
     if (!checkInDate || !checkOutDate) return null;
     try {
       const rooms = dbService.getRooms();
-      const matchedCat = rooms.find(r => r.category === roomCategory);
-      if (!matchedCat) return null;
-      const price = matchedCat.pricePerDay;
+      let targetRoom = selectedRoom;
+      if (!targetRoom) {
+        const roomsOfCat = rooms.filter(r => r.category === roomCategory);
+        targetRoom = roomsOfCat.find(r => r.status === 'Available') || roomsOfCat[0];
+      }
+      if (!targetRoom) return null;
+      const price = targetRoom.pricePerDay;
 
       const t1 = new Date(checkInDate).getTime();
       const t2 = new Date(checkOutDate).getTime();
@@ -301,16 +323,13 @@ and Patient UHID Card.
         {/* Header */}
         <div className="p-6 bg-gradient-to-r from-slate-900 to-[#1e293b] text-white flex justify-between items-center relative shrink-0">
           <div>
-            <span className="text-xs text-blue-400 font-mono tracking-widest uppercase font-semibold">
-              Medical Lodging & Transit Care
-            </span>
-            <h3 className="text-xl md:text-2xl font-bold tracking-tight mt-0.5">Book Stay & Airport Pickup</h3>
+            <h3 className="text-xl md:text-2xl font-bold tracking-tight">Booking Details</h3>
           </div>
           <button 
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer text-lg font-light animate-none"
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer shrink-0"
           >
-            &times;
+            <X className="w-4 h-4 shrink-0" />
           </button>
         </div>
 
@@ -541,7 +560,7 @@ and Patient UHID Card.
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-medium text-slate-650 mb-1">
-                      Guest / Primary Attendant Name *
+                      Name *
                     </label>
                     <div className="relative">
                       <User className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
@@ -588,33 +607,30 @@ and Patient UHID Card.
 
                   <div>
                     <label className="block text-xs font-medium text-slate-655 mb-1">
-                      Origin State/Country *
+                      Country *
                     </label>
-                    <select
-                      value={guestState}
-                      onChange={(e) => setGuestState(e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:border-blue-500"
-                    >
-                      {StatesList.map((state) => (
-                        <option key={state} value={state}>{state}</option>
-                      ))}
-                    </select>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. India"
+                      value={guestCountry}
+                      onChange={(e) => setGuestCountry(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
+                    />
                   </div>
 
-                  <div className="md:col-span-2">
+                  <div>
                     <label className="block text-xs font-medium text-slate-655 mb-1">
-                      CMC OP UHID Card No (Optional - if already registered)
+                      State *
                     </label>
-                    <div className="relative">
-                      <ClipboardList className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
-                      <input
-                        type="text"
-                        placeholder="e.g. CMC-789012-K (Helps us coordinate hospital appointments)"
-                        value={patientCardNo}
-                        onChange={(e) => setPatientCardNo(e.target.value)}
-                        className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
-                      />
-                    </div>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. West Bengal"
+                      value={guestState}
+                      onChange={(e) => setGuestState(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
+                    />
                   </div>
                 </div>
               </div>
@@ -626,18 +642,76 @@ and Patient UHID Card.
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="md:col-span-1">
-                    <label className="block text-xs font-medium text-slate-655 mb-1">
-                      Preferred Room Category
-                    </label>
-                    <select
-                      value={roomCategory}
-                      onChange={(e) => setRoomCategory(e.target.value as any)}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:border-blue-500"
-                    >
-                      {roomCategories.map((cat) => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
-                    </select>
+                    {selectedRoom ? (
+                      <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3 h-full flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-rose-600 font-mono">SELECTED ROOM</span>
+                            <span className="text-[11px] font-mono font-extrabold text-blue-600 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-lg">
+                              Room {selectedRoom.roomNumber}
+                            </span>
+                          </div>
+                          
+                          <h5 className="text-xs font-bold text-slate-900 mt-2">{selectedRoom.category}</h5>
+                          <p className="text-[10px] text-slate-500 mt-0.5 font-light leading-relaxed truncate">{selectedRoom.description}</p>
+                          
+                          <div className="mt-2 pt-2 border-t border-slate-200/55 flex flex-wrap gap-1">
+                            <span className="text-[9px] font-mono text-slate-600 bg-white border border-slate-150 px-1.5 py-0.5 rounded">🛏 {selectedRoom.beds}</span>
+                            <span className="text-[9px] font-mono text-slate-600 bg-white border border-slate-150 px-1.5 py-0.5 rounded">👥 Max {selectedRoom.capacity}</span>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 pt-2 border-t border-slate-200/55 flex items-center justify-between text-[11px] font-mono font-extrabold">
+                          <span className="text-slate-400">Rate:</span>
+                          <span className="text-blue-600 uppercase">₹{selectedRoom.pricePerDay} / Day</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <label className="block text-xs font-medium text-slate-655 mb-1">
+                          Room Air Conditioning Tab
+                        </label>
+                        <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+                          <button
+                            type="button"
+                            onClick={() => handleTabChange('Non-AC')}
+                            className={`flex-1 py-1.5 text-center text-xs font-bold rounded-lg transition-all duration-200 cursor-pointer ${
+                              roomTypeTab === 'Non-AC'
+                                ? 'bg-white text-blue-600 shadow-sm border border-slate-200/50'
+                                : 'text-slate-500 hover:text-slate-800'
+                            }`}
+                          >
+                            Non-AC
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleTabChange('AC')}
+                            className={`flex-1 py-1.5 text-center text-xs font-bold rounded-lg transition-all duration-200 cursor-pointer ${
+                              roomTypeTab === 'AC'
+                                ? 'bg-white text-blue-600 shadow-sm border border-slate-200/55'
+                                : 'text-slate-500 hover:text-slate-800'
+                            }`}
+                          >
+                            AC
+                          </button>
+                        </div>
+
+                        <div className="pt-0.5">
+                          <label className="block text-[11px] font-medium text-slate-400 mb-1">
+                            Select Room Category
+                          </label>
+                          <select
+                            value={roomCategory}
+                            onChange={(e) => setRoomCategory(e.target.value as any)}
+                            className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs bg-white focus:outline-none focus:border-blue-500"
+                          >
+                            {filteredCategories.map((cat) => (
+                              <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -785,6 +859,53 @@ and Patient UHID Card.
                     </div>
                   </div>
                 )}
+              </div>
+
+              {/* Choose Payment Options */}
+              <div className="pt-2 border-t border-slate-100">
+                <h4 className="text-xs font-mono uppercase tracking-widest text-blue-600 font-bold mb-3 text-slate-500">
+                  4. Choose Payment Option
+                </h4>
+                <p className="text-xs text-slate-500 mb-3">
+                  Please select how you would prefer to settle your room charges. Verification details are requested on arrival.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* UPI Option */}
+                  <div 
+                    onClick={() => setPaymentMethod('UPI')}
+                    className={`p-3 rounded-xl border-2 cursor-pointer transition flex gap-3 items-start ${
+                      paymentMethod === 'UPI' 
+                        ? 'border-blue-600 bg-blue-50/10' 
+                        : 'border-slate-250 border-slate-200 hover:border-slate-300 bg-white'
+                    }`}
+                  >
+                    <div className={`p-2 rounded-lg shrink-0 ${paymentMethod === 'UPI' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                      <QrCode className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs font-bold text-slate-900 font-sans">UPI / GPay / PhonePe</p>
+                      <p className="text-[10px] text-slate-500 mt-0.5 leading-normal">Fastest verification & instant reservation confirmation receipt.</p>
+                    </div>
+                  </div>
+
+                  {/* Cash Option */}
+                  <div 
+                    onClick={() => setPaymentMethod('Cash')}
+                    className={`p-3 rounded-xl border-2 cursor-pointer transition flex gap-3 items-start ${
+                      paymentMethod === 'Cash' 
+                        ? 'border-blue-600 bg-blue-50/10' 
+                        : 'border-slate-200 hover:border-slate-300 bg-white'
+                    }`}
+                  >
+                    <div className={`p-2 rounded-lg shrink-0 ${paymentMethod === 'Cash' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                      <Banknote className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs font-bold text-slate-900 font-sans">Cash at Check-In</p>
+                      <p className="text-[10px] text-slate-500 mt-0.5 leading-normal">Pay with physical cash directly at Seenu Guest House front desk.</p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Special Instructions */}

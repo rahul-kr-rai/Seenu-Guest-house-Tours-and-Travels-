@@ -1178,6 +1178,9 @@ export default function AdminDashboard({ onBackToWebsite }: AdminDashboardProps)
                                 <p className="text-slate-500 uppercase tracking-widest font-mono text-[10px]">Lodging Choice</p>
                                 <p className="font-semibold text-slate-100 mt-1">{bk.roomCategory}</p>
                                 <p className="text-emerald-400 font-mono mt-0.5 font-bold">₹{bk.totalAmount.toLocaleString()} Estimated</p>
+                                {bk.paymentMethod && (
+                                  <p className="text-[10px] text-blue-400 font-mono mt-1">💳 Pay Method: <span className="font-bold text-slate-300">{bk.paymentMethod}</span></p>
+                                )}
                               </div>
 
                               <div>

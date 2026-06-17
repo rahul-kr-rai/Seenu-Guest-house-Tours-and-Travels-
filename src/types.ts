@@ -22,6 +22,7 @@ export interface Booking {
   guestPhone: string;
   guestEmail?: string;
   guestState: string; // Patient families come from West Bengal, Bangladesh, etc.
+  guestCountry?: string; // Optional guest country
   patientCardNo?: string; // Optional CMC UHID
   roomCategory: string;
   assignedRoomId?: string;
@@ -36,6 +37,7 @@ export interface Booking {
     flightOrTrainNo?: string;
   };
   specialInstructions?: string;
+  paymentMethod?: string;
   createdAt: string;
 }
 

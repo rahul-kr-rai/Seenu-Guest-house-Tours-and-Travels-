@@ -15,7 +15,7 @@ import {
   Phone, Globe, CheckCircle2, Star, Send, 
   HelpCircle, MessageSquare, ClipboardCheck, ArrowRight, MapPin,
   MessageCircle, Menu, X, Calculator, Plus, Minus, Car, Award,
-  QrCode, Calendar, ClipboardList, ArrowUp
+  QrCode, Calendar, ClipboardList, ArrowUp, Search, SlidersHorizontal, Filter
 } from 'lucide-react';
 
 interface UserAppProps {
@@ -28,6 +28,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [selectedRoomCat, setSelectedRoomCat] = useState('Non-AC Single Room');
+  const [selectedRoomForBooking, setSelectedRoomForBooking] = useState<GuestRoom | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Room comparison states
@@ -43,6 +44,36 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
   const [scannedRoomNo, setScannedRoomNo] = useState<string>('TBD');
   const [isConfirmingWA, setIsConfirmingWA] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Room Search and Filtering States
+  const [acFilter, setAcFilter] = useState<'All' | 'AC' | 'Non-AC'>('All');
+  const [priceRange, setPriceRange] = useState<number>(1200);
+  const [capacityFilter, setCapacityFilter] = useState<string>('All');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+
+  const filteredRooms = rooms.filter(room => {
+    // AC Filter
+    const isAC = room.category.toLowerCase().includes('ac') && !room.category.toLowerCase().includes('non-ac');
+    if (acFilter === 'AC' && !isAC) return false;
+    if (acFilter === 'Non-AC' && isAC) return false;
+
+    // Price Filter
+    if (room.pricePerDay > priceRange) return false;
+
+    // Capacity Filter
+    if (capacityFilter !== 'All' && room.capacity.toString() !== capacityFilter) return false;
+
+    // Search Query
+    if (searchQuery.trim() !== '') {
+      const q = searchQuery.toLowerCase();
+      const matchCategory = room.category.toLowerCase().includes(q);
+      const matchDesc = room.description.toLowerCase().includes(q);
+      const matchRoomNo = room.roomNumber.toLowerCase().includes(q);
+      if (!matchCategory && !matchDesc && !matchRoomNo) return false;
+    }
+
+    return true;
+  });
 
   const handleToggleCompare = (roomId: string) => {
     setSelectedComparisonRooms(prev => {
@@ -152,8 +183,9 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
     }
   }, []);
 
-  const handleBookingStart = (category: string) => {
+  const handleBookingStart = (category: string, room?: GuestRoom | null) => {
     setSelectedRoomCat(category);
+    setSelectedRoomForBooking(room || null);
     setIsBookingOpen(true);
   };
 
@@ -241,7 +273,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button
-              onClick={() => handleBookingStart('Non-AC Single Room')}
+              onClick={() => scrollToSection('rooms-section')}
               className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 sm:px-5 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition shadow-xs cursor-pointer flex items-center gap-1 shrink-0"
             >
               Book Now
@@ -296,7 +328,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
             {/* Admin toggle for simple screens */}
             <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
               <button
-                onClick={() => { handleBookingStart('Non-AC Single Room'); setIsMobileMenuOpen(false); }}
+                onClick={() => { scrollToSection('rooms-section'); setIsMobileMenuOpen(false); }}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 rounded-xl font-semibold text-sm transition shadow-xs flex items-center justify-center gap-1.5"
               >
                 Book Now
@@ -609,7 +641,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
               {/* Action Reserve trigger */}
               <div className="mt-4">
                 <button
-                  onClick={() => handleBookingStart(heroRoomCat)}
+                  onClick={() => scrollToSection('rooms-section')}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-4 rounded-xl shadow-lg shadow-blue-600/10 transition duration-250 flex items-center justify-center gap-2 cursor-pointer text-sm"
                 >
                   Confirm Choice & Pre-Book Stay
@@ -635,7 +667,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <span className="text-xs font-mono font-bold text-blue-600 bg-blue-100/50 px-2.5 py-1 rounded-full uppercase tracking-widest">
-              Available Lodgings
+              Select Rooms
             </span>
             <h3 className="text-3xl font-extrabold font-sans text-slate-900 mt-3 leading-tight">
               Calm, Clean, and Economical Room Choices
@@ -645,11 +677,127 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
             </p>
           </div>
 
+          {/* Room Search & Filter Controls */}
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/65 p-6 mb-8">
+            <div className="flex flex-col gap-6">
+              {/* Header inside filters */}
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <SlidersHorizontal className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-bold text-slate-800">Filter Guest Rooms</span>
+                </div>
+                {(acFilter !== 'All' || priceRange !== 1200 || capacityFilter !== 'All' || searchQuery !== '') && (
+                  <button 
+                    onClick={() => {
+                      setAcFilter('All');
+                      setPriceRange(1200);
+                      setCapacityFilter('All');
+                      setSearchQuery('');
+                    }}
+                    className="text-xs font-semibold text-blue-600 hover:text-blue-800 transition cursor-pointer"
+                  >
+                    Clear Filters
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                {/* Search Text Query */}
+                <div className="space-y-1.5 font-sans">
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider font-mono">Search Keyword</label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                    <input 
+                      type="text" 
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="e.g. Single, Double, Balcony, WiFi..."
+                      className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs bg-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-medium"
+                    />
+                  </div>
+                </div>
+
+                {/* AC / Non-AC selection pills */}
+                <div className="space-y-1.5 font-sans">
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider font-mono">Air Conditioning</label>
+                  <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200/60 font-sans">
+                    {(['All', 'AC', 'Non-AC'] as const).map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => setAcFilter(opt)}
+                        className={`flex-1 py-1.5 text-center text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer ${
+                          acFilter === opt
+                            ? 'bg-white text-blue-600 shadow-xs border border-slate-200/50 font-semibold'
+                            : 'text-slate-500 hover:text-slate-800'
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Capacity Select */}
+                <div className="space-y-1.5 font-sans">
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider font-mono">Beds / Capacity</label>
+                  <select
+                    value={capacityFilter}
+                    onChange={(e) => setCapacityFilter(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs bg-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-medium cursor-pointer font-sans"
+                  >
+                    <option value="All">All Capacities</option>
+                    <option value="1">1 Person (Single Bed)</option>
+                    <option value="2">2 People (Double / Twin Bed)</option>
+                  </select>
+                </div>
+
+                {/* Price Select Slider Column */}
+                <div className="space-y-1.5 font-sans">
+                  <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider font-mono">
+                    <span>Max Price</span>
+                    <span className="text-blue-600 font-bold font-mono">₹{priceRange} / Day</span>
+                  </div>
+                  <div className="flex items-center gap-2 pt-1.5">
+                    <span className="text-[10px] font-mono text-slate-400">₹300</span>
+                    <input 
+                      type="range"
+                      min="300"
+                      max="1200"
+                      step="50"
+                      value={priceRange}
+                      onChange={(e) => setPriceRange(Number(e.target.value))}
+                      className="flex-1 accent-blue-600 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                    />
+                    <span className="text-[10px] font-mono text-slate-400">₹1200</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {rooms.length === 0 ? (
-              <div className="col-span-full py-12 text-center text-gray-400">Loading guest room statuses...</div>
+              <div className="col-span-full py-12 text-center text-gray-400 font-sans">Loading guest room statuses...</div>
+            ) : filteredRooms.length === 0 ? (
+              <div className="col-span-full py-16 bg-white border border-slate-200/60 rounded-2xl p-8 text-center shadow-xs font-sans">
+                <Filter className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                <h4 className="text-base font-bold text-slate-800">No rooms found</h4>
+                <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">None of our rooms fit your current filter settings. Try clearing some selections or typing a different keyword!</p>
+                <button 
+                  onClick={() => {
+                    setAcFilter('All');
+                    setPriceRange(1200);
+                    setCapacityFilter('All');
+                    setSearchQuery('');
+                  }}
+                  className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs transition cursor-pointer"
+                >
+                  Reset Filters
+                </button>
+              </div>
             ) : (
-              rooms.map((room) => {
+              filteredRooms.map((room) => {
                 const isUnderMaintenance = room.status === 'Maintenance';
                 return (
                   <div 
@@ -735,6 +883,10 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
                       <div className="mt-6 pt-4">
                         <button
                           disabled={isUnderMaintenance}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleBookingStart(room.category, room);
+                          }}
                           className={`w-full py-2.5 rounded-xl text-center font-bold text-sm transition tracking-tight flex items-center justify-center gap-1.5 ${
                             isUnderMaintenance 
                               ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
@@ -1005,8 +1157,8 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
           room={selectedRoomForDetails}
           onClose={() => setSelectedRoomForDetails(null)}
           onBookNow={(category) => {
+            handleBookingStart(category, selectedRoomForDetails);
             setSelectedRoomForDetails(null);
-            handleBookingStart(category);
           }}
         />
       )}
@@ -1014,12 +1166,17 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
       {/* Booking Form modal overlay */}
       {isBookingOpen && (
         <BookingForm
-          onClose={() => setIsBookingOpen(false)}
+          onClose={() => {
+            setIsBookingOpen(false);
+            setSelectedRoomForBooking(null);
+          }}
           onSuccess={() => {
             // Hotreload State of Room listing
             setRooms(dbService.getRooms());
+            setSelectedRoomForBooking(null);
           }}
           selectedCategory={selectedRoomCat}
+          selectedRoom={selectedRoomForBooking || undefined}
         />
       )}
 
@@ -1202,7 +1359,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
                 <div className="flex gap-2.5">
                   <button
                     onClick={() => {
-                      handleBookingStart(comparedRoomsList[0].category);
+                      handleBookingStart(comparedRoomsList[0].category, comparedRoomsList[0]);
                       setIsCompareModalOpen(false);
                     }}
                     className="flex-1 sm:flex-none px-4 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-md cursor-pointer"
@@ -1211,7 +1368,7 @@ export default function UserApp({ onOpenAdmin }: UserAppProps) {
                   </button>
                   <button
                     onClick={() => {
-                      handleBookingStart(comparedRoomsList[1].category);
+                      handleBookingStart(comparedRoomsList[1].category, comparedRoomsList[1]);
                       setIsCompareModalOpen(false);
                     }}
                     className="flex-1 sm:flex-none px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-md cursor-pointer"
